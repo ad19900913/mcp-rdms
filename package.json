@@ -1,7 +1,7 @@
 {
   "name": "rdms-mcp-server",
-  "version": "1.0.1",
-    "bin": {
+  "version": "1.0.2",
+  "bin": {
     "rdms-mcp-server": "./index.js"
   },
   "description": "MCP server for reading RDMS bug tracking system with AI image analysis",
