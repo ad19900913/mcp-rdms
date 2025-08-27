@@ -150,6 +150,42 @@ class ZentaoMCPServer {
               }
             }
           }
+        },
+        {
+          name: "zentao_get_work_dashboard",
+          description: "Get work dashboard information including bug counts",
+          inputSchema: {
+            type: "object",
+            properties: {}
+          }
+        },
+        {
+          name: "zentao_get_pending_bugs",
+          description: "Get pending bugs assigned to current user",
+          inputSchema: {
+            type: "object",
+            properties: {
+              limit: {
+                type: "number",
+                description: "Maximum number of results",
+                default: 20
+              }
+            }
+          }
+        },
+        {
+          name: "zentao_get_market_defects",
+          description: "Get market defects assigned to current user",
+          inputSchema: {
+            type: "object",
+            properties: {
+              limit: {
+                type: "number",
+                description: "Maximum number of results",
+                default: 20
+              }
+            }
+          }
         }
       ]
     }));
@@ -172,7 +208,17 @@ class ZentaoMCPServer {
             return await this.getBugList(args.project, args.limit);
           
           case "zentao_get_my_bugs":
+          case "zentao_get_my_bugs":
             return await this.getMyBugs(args.status, args.limit);
+          
+          case "zentao_get_work_dashboard":
+            return await this.getWorkDashboard();
+          
+          case "zentao_get_pending_bugs":
+            return await this.getPendingBugs(args.limit);
+          
+          case "zentao_get_market_defects":
+            return await this.getMarketDefects(args.limit);
           
           default:
             throw new McpError(
@@ -592,6 +638,178 @@ class ZentaoMCPServer {
     } catch (error) {
       throw new Error(`Failed to get my bugs: ${error.message}`);
     }
+  }
+
+  // 获取工作面板信息
+  async getWorkDashboard() {
+    await this.ensureLoggedIn();
+    
+    try {
+      const dashboardUrl = `${this.baseUrl}/index.php?m=my&f=index`;
+      console.log(`正在访问工作面板: ${dashboardUrl}`);
+      
+      const response = await this.client.get(dashboardUrl);
+      if (response.status !== 200) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const $ = cheerio.load(response.data);
+      const dashboard = {};
+      
+      // 尝试提取我的BUG数量
+      const bugSelectors = [
+        'a[href*="assignedTo"] .number',
+        'a[href*="bug"] .count',
+        '.bug-count',
+        'td:contains("我的BUG") + td',
+        'a[href*="work&mode=bug"] .label-badge'
+      ];
+      
+      for (const selector of bugSelectors) {
+        const element = $(selector);
+        if (element.length > 0) {
+          dashboard.myBugs = element.text().trim();
+          break;
+        }
+      }
+      
+      // 提取其他统计信息
+      $('a[href*="my"]').each((index, element) => {
+        const $link = $(element);
+        const text = $link.text().trim();
+        const number = $link.find('.number, .count, .label-badge').text().trim();
+        
+        if (text && number) {
+          if (text.includes('BUG') || text.includes('bug')) {
+            dashboard.myBugs = number;
+          } else if (text.includes('任务') || text.includes('task')) {
+            dashboard.myTasks = number;
+          } else if (text.includes('需求') || text.includes('story')) {
+            dashboard.myStories = number;
+          }
+        }
+      });
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              success: true,
+              dashboard: dashboard,
+              message: '工作面板信息获取成功'
+            }, null, 2)
+          }
+        ]
+      };
+      
+    } catch (error) {
+      throw new Error(`获取工作面板失败: ${error.message}`);
+    }
+  }
+
+  // 获取待处理BUG
+  async getPendingBugs(limit = 20) {
+    await this.ensureLoggedIn();
+    
+    try {
+      const pendingUrl = `${this.baseUrl}/index.php?m=my&f=work&mode=bug&type=assignedTo`;
+      console.log(`正在获取待处理BUG: ${pendingUrl}`);
+      
+      const response = await this.client.get(pendingUrl);
+      if (response.status !== 200) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return await this.parseBugList(response.data, limit, '待处理BUG');
+      
+    } catch (error) {
+      throw new Error(`获取待处理BUG失败: ${error.message}`);
+    }
+  }
+
+  // 获取市场缺陷
+  async getMarketDefects(limit = 20) {
+    await this.ensureLoggedIn();
+    
+    try {
+      const defectsUrl = `${this.baseUrl}/index.php?m=bugmarket&f=browse&productid=0&branch=0&browseType=assigntome`;
+      console.log(`正在获取市场缺陷: ${defectsUrl}`);
+      
+      const response = await this.client.get(defectsUrl);
+      if (response.status !== 200) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return await this.parseBugList(response.data, limit, '市场缺陷');
+      
+    } catch (error) {
+      throw new Error(`获取市场缺陷失败: ${error.message}`);
+    }
+  }
+
+  // 通用BUG列表解析方法
+  async parseBugList(html, limit, type) {
+    const $ = cheerio.load(html);
+    const bugs = [];
+    
+    // 尝试多种选择器来查找BUG列表
+    const selectors = [
+      'table tbody tr',
+      '.table tbody tr',
+      '#bugList tbody tr',
+      '.bug-item',
+      'tr[data-id]'
+    ];
+    
+    let bugRows = $();
+    for (const selector of selectors) {
+      bugRows = $(selector);
+      if (bugRows.length > 0) {
+        console.log(`使用选择器找到 ${bugRows.length} 行: ${selector}`);
+        break;
+      }
+    }
+    
+    bugRows.each((index, element) => {
+      if (index >= limit) return false;
+      
+      const $row = $(element);
+      const cells = $row.find('td');
+      
+      if (cells.length > 0) {
+        const bug = {
+          id: cells.eq(0).text().trim() || $row.attr('data-id') || '',
+          title: cells.eq(1).text().trim() || cells.eq(2).text().trim() || '',
+          status: cells.eq(3).text().trim() || cells.eq(4).text().trim() || '',
+          priority: cells.eq(4).text().trim() || cells.eq(5).text().trim() || '',
+          severity: cells.eq(5).text().trim() || cells.eq(6).text().trim() || '',
+          assignedTo: cells.eq(6).text().trim() || cells.eq(7).text().trim() || '',
+          reporter: cells.eq(7).text().trim() || cells.eq(8).text().trim() || '',
+          created: cells.eq(8).text().trim() || cells.eq(9).text().trim() || ''
+        };
+        
+        // 过滤空的BUG记录和表头
+        if (bug.id && bug.title && bug.id !== 'ID' && !isNaN(parseInt(bug.id))) {
+          bugs.push(bug);
+        }
+      }
+    });
+    
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({
+            success: true,
+            total: bugs.length,
+            bugs: bugs,
+            type: type,
+            message: bugs.length > 0 ? `找到 ${bugs.length} 个${type}` : `暂无${type}`
+          }, null, 2)
+        }
+      ]
+    };
   }
 
   async run() {
