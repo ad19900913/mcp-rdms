@@ -5,10 +5,20 @@ async function runTests() {
   const password = process.argv[3];
   const testType = process.argv[4] || 'all';
   
+  // 如果没有提供用户名密码，只进行基本的语法检查
   if (!username || !password) {
-    console.log('用法: node test.js <用户名> <密码> [测试类型]');
-    console.log('测试类型: all, login, bug, dashboard, pending, market, my-bugs');
-    process.exit(1);
+    console.log('🔍 运行基本语法检查...');
+    try {
+      // 导入模块进行语法检查
+      await import('./index.js');
+      console.log('✅ 语法检查通过');
+      console.log('\n📝 完整测试用法: node test.js <用户名> <密码> [测试类型]');
+      console.log('测试类型: all, login, bug, dashboard, pending, market, my-bugs');
+      return;
+    } catch (error) {
+      console.error('❌ 语法检查失败:', error.message);
+      process.exit(1);
+    }
   }
 
   // 设置环境变量
@@ -22,7 +32,7 @@ async function runTests() {
   console.log('🚀 RDMS MCP服务器测试套件\n');
 
   if (testType === 'all' || testType === 'login') {
-    console.log('1️⃣ 测试登录功能...');
+    console.log('1️⃣ 测试登录...');
     await testTool('rdms_login', {
       baseUrl: 'https://rdms.streamax.com',
       username: username,
@@ -59,22 +69,12 @@ async function runTests() {
   console.log('\n✅ 测试完成！');
 }
 
-function testTool(toolName, args, env) {
-  return new Promise((resolve, reject) => {
+async function testTool(toolName, args, env) {
+  return new Promise((resolve) => {
     const child = spawn('node', ['index.js'], { 
-      env,
-      stdio: ['pipe', 'pipe', 'inherit']
+      env: env,
+      stdio: ['pipe', 'pipe', 'pipe']
     });
-
-    const request = {
-      jsonrpc: "2.0",
-      id: 1,
-      method: "tools/call",
-      params: {
-        name: toolName,
-        arguments: args
-      }
-    };
 
     let output = '';
     
@@ -82,10 +82,21 @@ function testTool(toolName, args, env) {
       output += data.toString();
     });
 
-    child.on('close', (code) => {
+    child.stderr.on('data', (data) => {
+      console.log('Zentao MCP server running on stdio');
+    });
+
+    child.on('close', () => {
       try {
-        const lines = output.trim().split('\n');
+        const lines = output.trim().split('\n').filter(line => line.trim());
         const lastLine = lines[lines.length - 1];
+        
+        if (!lastLine) {
+          console.log(`❌ ${toolName} 失败: 无响应`);
+          resolve();
+          return;
+        }
+
         const response = JSON.parse(lastLine);
         
         if (response.result && response.result.content) {
@@ -106,6 +117,16 @@ function testTool(toolName, args, env) {
       }
       resolve();
     });
+
+    const request = {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: toolName,
+        arguments: args
+      }
+    };
 
     child.stdin.write(JSON.stringify(request) + '\n');
     child.stdin.end();

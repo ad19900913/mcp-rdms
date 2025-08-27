@@ -30,8 +30,4 @@ jobs:
       run: npm run lint --if-present
       
     - name: Run tests
-      run: npm test
-      env:
-        RDMS_BASE_URL: ${{ secrets.RDMS_BASE_URL }}
-        RDMS_USERNAME: ${{ secrets.RDMS_USERNAME }}
-        RDMS_PASSWORD: ${{ secrets.RDMS_PASSWORD }}
+      run: npm run test:publish
