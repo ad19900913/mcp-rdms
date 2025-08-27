@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "zentao": {
+      "command": "node",
+      "args": ["C:/Users/captain/CodeBuddy/20250826191001/index.js"],
+      "env": {
+        "ZENTAO_BASE_URL": "https://rdms.streamax.com",
+        "ZENTAO_USERNAME": "替换为你的用户名",
+        "ZENTAO_PASSWORD": "替换为你的密码"
+      }
+    }
+  }
+}
