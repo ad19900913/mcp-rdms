@@ -1,13 +1,13 @@
 {
   "mcpServers": {
-    "zentao": {
+    "rdms": {
       "command": "node",
       "args": ["./index.js"],
       "cwd": "./",
       "env": {
-        "ZENTAO_BASE_URL": "https://rdms.streamax.com",
-        "ZENTAO_USERNAME": "your_username",
-        "ZENTAO_PASSWORD": "your_password"
+        "RDMS_BASE_URL": "https://rdms.streamax.com",
+        "RDMS_USERNAME": "your_username",
+        "RDMS_PASSWORD": "your_password"
       }
     }
   }

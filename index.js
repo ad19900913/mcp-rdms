@@ -8,14 +8,16 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import fs from 'fs';
+import path from 'path';
 
-export class ZentaoMCPServer {
+export class RDMSMCPServer {
   static cookies = {};
 
   constructor() {
     this.server = new Server(
       {
-        name: 'zentao-mcp-server',
+        name: 'rdms-mcp-server',
         version: '1.0.0',
       },
       {
@@ -25,9 +27,9 @@ export class ZentaoMCPServer {
       }
     );
 
-    this.baseUrl = process.env.ZENTAO_BASE_URL || '';
-    this.username = process.env.ZENTAO_USERNAME || '';
-    this.password = process.env.ZENTAO_PASSWORD || '';
+    this.baseUrl = process.env.RDMS_BASE_URL || '';
+    this.username = process.env.RDMS_USERNAME || '';
+    this.password = process.env.RDMS_PASSWORD || '';
     this.isLoggedIn = false;
     
     this.client = axios.create({
@@ -44,7 +46,7 @@ export class ZentaoMCPServer {
   setupCookieInterceptors() {
     // 请求拦截器：添加cookies
     this.client.interceptors.request.use(config => {
-      const cookieString = Object.entries(ZentaoMCPServer.cookies)
+      const cookieString = Object.entries(RDMSMCPServer.cookies)
         .map(([key, value]) => `${key}=${value}`)
         .join('; ');
       
@@ -63,7 +65,7 @@ export class ZentaoMCPServer {
           const [nameValue] = cookie.split(';');
           const [name, value] = nameValue.split('=');
           if (name && value) {
-            ZentaoMCPServer.cookies[name.trim()] = value.trim();
+            RDMSMCPServer.cookies[name.trim()] = value.trim();
           }
         });
       }
@@ -75,12 +77,12 @@ export class ZentaoMCPServer {
     this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
       tools: [
         {
-          name: 'zentao_login',
-          description: 'Login to Zentao system',
+          name: 'rdms_login',
+          description: 'Login to RDMS system',
           inputSchema: {
             type: 'object',
             properties: {
-              baseUrl: { type: 'string', description: 'Zentao base URL' },
+              baseUrl: { type: 'string', description: 'RDMS base URL' },
               username: { type: 'string', description: 'Username' },
               password: { type: 'string', description: 'Password' }
             },
@@ -88,29 +90,31 @@ export class ZentaoMCPServer {
           }
         },
         {
-          name: 'zentao_get_bug',
-          description: 'Get bug details by ID with image extraction',
+          name: 'rdms_get_bug',
+          description: 'Get bug details by ID with image extraction and analysis',
           inputSchema: {
             type: 'object',
             properties: {
-              bugId: { type: 'string', description: 'Bug ID' }
+              bugId: { type: 'string', description: 'Bug ID' },
+              analyzeImages: { type: 'boolean', description: 'Whether to analyze images with AI vision', default: true }
             },
             required: ['bugId']
           }
         },
         {
-          name: 'zentao_get_market_defect',
-          description: 'Get market defect details by ID with image extraction',
+          name: 'rdms_get_market_defect',
+          description: 'Get market defect details by ID with image extraction and analysis',
           inputSchema: {
             type: 'object',
             properties: {
-              defectId: { type: 'string', description: 'Market defect ID' }
+              defectId: { type: 'string', description: 'Market defect ID' },
+              analyzeImages: { type: 'boolean', description: 'Whether to analyze images with AI vision', default: true }
             },
             required: ['defectId']
           }
         },
         {
-          name: 'zentao_search_bugs',
+          name: 'rdms_search_bugs',
           description: 'Search bugs with enhanced filters',
           inputSchema: {
             type: 'object',
@@ -125,7 +129,7 @@ export class ZentaoMCPServer {
           }
         },
         {
-          name: 'zentao_search_market_defects',
+          name: 'rdms_search_market_defects',
           description: 'Search market defects',
           inputSchema: {
             type: 'object',
@@ -138,7 +142,7 @@ export class ZentaoMCPServer {
           }
         },
         {
-          name: 'zentao_get_my_bugs',
+          name: 'rdms_get_my_bugs',
           description: 'Get bugs assigned to current user',
           inputSchema: {
             type: 'object',
@@ -149,7 +153,7 @@ export class ZentaoMCPServer {
           }
         },
         {
-          name: 'zentao_get_pending_bugs',
+          name: 'rdms_get_pending_bugs',
           description: 'Get pending bugs assigned to current user',
           inputSchema: {
             type: 'object',
@@ -159,7 +163,7 @@ export class ZentaoMCPServer {
           }
         },
         {
-          name: 'zentao_get_market_defects',
+          name: 'rdms_get_market_defects',
           description: 'Get market defects assigned to current user',
           inputSchema: {
             type: 'object',
@@ -169,11 +173,24 @@ export class ZentaoMCPServer {
           }
         },
         {
-          name: 'zentao_get_work_dashboard',
+          name: 'rdms_get_work_dashboard',
           description: 'Get work dashboard information',
           inputSchema: {
             type: 'object',
             properties: {}
+          }
+        },
+        {
+          name: 'rdms_download_image',
+          description: 'Download and optionally analyze image from RDMS system',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              imageUrl: { type: 'string', description: 'Image URL from RDMS' },
+              filename: { type: 'string', description: 'Optional filename for saved image' },
+              analyze: { type: 'boolean', description: 'Whether to return image for AI analysis', default: true }
+            },
+            required: ['imageUrl']
           }
         }
       ]
@@ -184,23 +201,25 @@ export class ZentaoMCPServer {
 
       try {
         switch (name) {
-          case 'zentao_login':
+          case 'rdms_login':
             return { content: [{ type: 'text', text: JSON.stringify(await this.login(args.baseUrl, args.username, args.password)) }] };
-          case 'zentao_get_bug':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.getBug(args.bugId)) }] };
-          case 'zentao_get_market_defect':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.getMarketDefect(args.defectId)) }] };
-          case 'zentao_search_bugs':
+          case 'rdms_get_bug':
+            return { content: [{ type: 'text', text: JSON.stringify(await this.getBug(args.bugId, args.analyzeImages)) }] };
+          case 'rdms_get_market_defect':
+            return { content: [{ type: 'text', text: JSON.stringify(await this.getMarketDefect(args.defectId, args.analyzeImages)) }] };
+          case 'rdms_search_bugs':
             return { content: [{ type: 'text', text: JSON.stringify(await this.searchBugs(args.query, args)) }] };
-          case 'zentao_search_market_defects':
+          case 'rdms_search_market_defects':
             return { content: [{ type: 'text', text: JSON.stringify(await this.searchMarketDefects(args.query, args)) }] };
-          case 'zentao_get_my_bugs':
-          case 'zentao_get_pending_bugs':
+          case 'rdms_get_my_bugs':
+          case 'rdms_get_pending_bugs':
             return { content: [{ type: 'text', text: JSON.stringify(await this.getMyBugs(args.status, args.limit)) }] };
-          case 'zentao_get_market_defects':
+          case 'rdms_get_market_defects':
             return { content: [{ type: 'text', text: JSON.stringify(await this.getMarketDefects(args.limit)) }] };
-          case 'zentao_get_work_dashboard':
+          case 'rdms_get_work_dashboard':
             return { content: [{ type: 'text', text: JSON.stringify(await this.getWorkDashboard()) }] };
+          case 'rdms_download_image':
+            return await this.downloadImage(args.imageUrl, args.filename, args.analyze);
           default:
             throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
         }
@@ -243,7 +262,7 @@ export class ZentaoMCPServer {
       if (loginResponse.data.includes("self.location='/'") || loginResponse.data.length < 200) {
         this.isLoggedIn = true;
         console.log(`Auto-logged in to ${baseUrl} as ${username}`);
-        return { success: true, message: `Successfully logged in to Zentao system at ${baseUrl}` };
+        return { success: true, message: `Successfully logged in to RDMS system at ${baseUrl}` };
       } else {
         throw new Error('Login failed - invalid credentials or response');
       }
@@ -265,11 +284,11 @@ export class ZentaoMCPServer {
       await this.autoLogin();
     }
     if (!this.isLoggedIn) {
-      throw new Error('Not logged in. Please configure environment variables or use zentao_login tool.');
+      throw new Error('Not logged in. Please configure environment variables or use rdms_login tool.');
     }
   }
 
-  async getBug(bugId) {
+  async getBug(bugId, analyzeImages = true) {
     await this.ensureLoggedIn();
     try {
       const response = await this.client.get(`${this.baseUrl}/index.php?m=bug&f=view&bugID=${bugId}`);
@@ -288,7 +307,8 @@ export class ZentaoMCPServer {
         status: '', priority: '', severity: '', assignedTo: '', reporter: '',
         product: '', project: '', module: '', version: '', os: '', browser: '',
         steps: '', description: '', keywords: '', created: '', updated: '',
-        images: []
+        images: [],
+        imageAnalysis: []
       };
 
       // Extract images
@@ -342,13 +362,18 @@ export class ZentaoMCPServer {
         });
       });
 
+      // Analyze images if requested
+      if (analyzeImages && bugInfo.images.length > 0) {
+        bugInfo.imageAnalysis = await this.analyzeImages(bugInfo.images);
+      }
+
       return bugInfo;
     } catch (error) {
       return { error: error.message };
     }
   }
 
-  async getMarketDefect(defectId) {
+  async getMarketDefect(defectId, analyzeImages = true) {
     await this.ensureLoggedIn();
     try {
       const response = await this.client.get(`${this.baseUrl}/index.php?m=bugmarket&f=view&bugID=${defectId}`);
@@ -359,7 +384,8 @@ export class ZentaoMCPServer {
         title: $('.page-title').text().trim() || $('title').text().trim(),
         status: '', priority: '', severity: '', assignedTo: '', reporter: '',
         product: '', project: '', module: '', version: '', created: '', updated: '',
-        images: []
+        images: [],
+        imageAnalysis: []
       };
 
       // Extract images
@@ -387,9 +413,124 @@ export class ZentaoMCPServer {
         if (label.includes('所属模块') || label.includes('Module')) defectInfo.module = value;
       });
 
+      // Analyze images if requested
+      if (analyzeImages && defectInfo.images.length > 0) {
+        defectInfo.imageAnalysis = await this.analyzeImages(defectInfo.images);
+      }
+
       return defectInfo;
     } catch (error) {
       return { error: error.message };
+    }
+  }
+
+  async analyzeImages(imageUrls) {
+    const analysis = [];
+    
+    for (const imageUrl of imageUrls) {
+      try {
+        // Download image data
+        const response = await this.client.get(imageUrl, { responseType: 'arraybuffer' });
+        const imageBuffer = Buffer.from(response.data);
+        const base64Image = imageBuffer.toString('base64');
+        
+        // Determine image type
+        const contentType = response.headers['content-type'] || 'image/png';
+        const imageType = contentType.split('/')[1] || 'png';
+        
+        analysis.push({
+          url: imageUrl,
+          type: imageType,
+          size: imageBuffer.length,
+          base64: `data:${contentType};base64,${base64Image}`,
+          description: `Image from RDMS (${imageType}, ${Math.round(imageBuffer.length / 1024)}KB)`
+        });
+      } catch (error) {
+        analysis.push({
+          url: imageUrl,
+          error: `Failed to download image: ${error.message}`
+        });
+      }
+    }
+    
+    return analysis;
+  }
+
+  async downloadImage(imageUrl, filename, analyze = true) {
+    await this.ensureLoggedIn();
+    
+    try {
+      const response = await this.client.get(imageUrl, { responseType: 'arraybuffer' });
+      const imageBuffer = Buffer.from(response.data);
+      const contentType = response.headers['content-type'] || 'image/png';
+      const imageType = contentType.split('/')[1] || 'png';
+      
+      if (analyze) {
+        // Return image data for AI analysis
+        const base64Image = imageBuffer.toString('base64');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                success: true,
+                imageUrl,
+                type: imageType,
+                size: imageBuffer.length,
+                message: `Image downloaded successfully (${Math.round(imageBuffer.length / 1024)}KB)`
+              })
+            },
+            {
+              type: 'image',
+              data: base64Image,
+              mimeType: contentType
+            }
+          ]
+        };
+      } else {
+        // Save to file if filename provided
+        if (filename) {
+          const filepath = path.resolve(filename);
+          fs.writeFileSync(filepath, imageBuffer);
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                success: true,
+                imageUrl,
+                savedTo: filepath,
+                type: imageType,
+                size: imageBuffer.length,
+                message: `Image saved to ${filepath}`
+              })
+            }]
+          };
+        } else {
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                success: true,
+                imageUrl,
+                type: imageType,
+                size: imageBuffer.length,
+                message: 'Image downloaded successfully'
+              })
+            }]
+          };
+        }
+      }
+    } catch (error) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            success: false,
+            error: error.message,
+            imageUrl
+          })
+        }]
+      };
     }
   }
 
@@ -446,7 +587,6 @@ export class ZentaoMCPServer {
       return { success: false, error: error.message, bugs: [] };
     }
   }
-
 
   async getMarketDefects(limit = 20) {
     await this.ensureLoggedIn();
@@ -549,9 +689,9 @@ export class ZentaoMCPServer {
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.error('Zentao MCP server running on stdio');
+    console.error('RDMS MCP server running on stdio');
   }
 }
 
-const server = new ZentaoMCPServer();
+const server = new RDMSMCPServer();
 server.run().catch(console.error);

@@ -14,16 +14,16 @@ async function runTests() {
   // 设置环境变量
   const env = {
     ...process.env,
-    ZENTAO_BASE_URL: 'https://rdms.streamax.com',
-    ZENTAO_USERNAME: username,
-    ZENTAO_PASSWORD: password
+    RDMS_BASE_URL: 'https://rdms.streamax.com',
+    RDMS_USERNAME: username,
+    RDMS_PASSWORD: password
   };
 
-  console.log('🚀 禅道MCP服务器测试套件\n');
+  console.log('🚀 RDMS MCP服务器测试套件\n');
 
   if (testType === 'all' || testType === 'login') {
     console.log('1️⃣ 测试登录功能...');
-    await testTool('zentao_login', {
+    await testTool('rdms_login', {
       baseUrl: 'https://rdms.streamax.com',
       username: username,
       password: password
@@ -33,27 +33,27 @@ async function runTests() {
   if (testType === 'all' || testType === 'bug') {
     const bugId = process.argv[5] || '141480';
     console.log(`\n2️⃣ 测试获取BUG ${bugId}...`);
-    await testTool('zentao_get_bug', { bugId: bugId }, env);
+    await testTool('rdms_get_bug', { bugId: bugId }, env);
   }
 
   if (testType === 'all' || testType === 'dashboard') {
     console.log('\n3️⃣ 测试工作面板...');
-    await testTool('zentao_get_work_dashboard', {}, env);
+    await testTool('rdms_get_work_dashboard', {}, env);
   }
 
   if (testType === 'all' || testType === 'pending') {
     console.log('\n4️⃣ 测试待处理BUG...');
-    await testTool('zentao_get_pending_bugs', { limit: 10 }, env);
+    await testTool('rdms_get_pending_bugs', { limit: 10 }, env);
   }
 
   if (testType === 'all' || testType === 'market') {
     console.log('\n5️⃣ 测试市场缺陷...');
-    await testTool('zentao_get_market_defects', { limit: 10 }, env);
+    await testTool('rdms_get_market_defects', { limit: 10 }, env);
   }
 
   if (testType === 'all' || testType === 'my-bugs') {
     console.log('\n6️⃣ 测试我的BUG...');
-    await testTool('zentao_get_my_bugs', { status: 'active', limit: 10 }, env);
+    await testTool('rdms_get_my_bugs', { status: 'active', limit: 10 }, env);
   }
 
   console.log('\n✅ 测试完成！');

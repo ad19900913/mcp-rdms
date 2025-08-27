@@ -1,24 +1,25 @@
 {
-  "name": "zentao-mcp-server",
+  "name": "rdms-mcp-server",
   "version": "1.0.0",
-  "description": "MCP server for reading Zentao bug tracking system",
+  "description": "MCP server for reading RDMS bug tracking system with AI image analysis",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "node --watch index.js"
+    "dev": "node --watch index.js",
+    "test": "node test.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.4.0",
     "axios": "^1.6.0",
-    "axios-cookiejar-support": "^5.0.5",
-    "cheerio": "^1.0.0-rc.12",
-    "tough-cookie": "^4.1.4"
+    "cheerio": "^1.0.0-rc.12"
   },
   "keywords": [
     "mcp",
-    "zentao",
-    "bug-tracking"
+    "rdms",
+    "bug-tracking",
+    "ai-vision",
+    "image-analysis"
   ],
   "author": "CodeBuddy",
   "license": "MIT"
