@@ -4,23 +4,50 @@
   "description": "MCP server for reading RDMS bug tracking system with AI image analysis",
   "main": "index.js",
   "type": "module",
+  "homepage": "https://github.com/your-username/rdms-mcp-server#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/rdms-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/rdms-mcp-server/issues"
+  },
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "node test.js"
+    "test": "node test.js",
+    "prepublishOnly": "npm test"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.4.0",
     "axios": "^1.6.0",
     "cheerio": "^1.0.0-rc.12"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "keywords": [
     "mcp",
     "rdms",
     "bug-tracking",
     "ai-vision",
-    "image-analysis"
+    "image-analysis",
+    "cursor",
+    "model-context-protocol",
+    "zentao",
+    "automation",
+    "testing"
   ],
-  "author": "CodeBuddy",
-  "license": "MIT"
+  "author": {
+    "name": "CodeBuddy",
+    "email": "your-email@example.com"
+  },
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "cursor-mcp-config.json"
+  ]
 }

@@ -1,0 +1,37 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run linting
+      run: npm run lint --if-present
+      
+    - name: Run tests
+      run: npm test
+      env:
+        RDMS_BASE_URL: ${{ secrets.RDMS_BASE_URL }}
+        RDMS_USERNAME: ${{ secrets.RDMS_USERNAME }}
+        RDMS_PASSWORD: ${{ secrets.RDMS_PASSWORD }}
