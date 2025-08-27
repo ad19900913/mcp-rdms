@@ -195,9 +195,8 @@ export class ZentaoMCPServer {
           case 'zentao_search_market_defects':
             return { content: [{ type: 'text', text: JSON.stringify(await this.searchMarketDefects(args.query, args)) }] };
           case 'zentao_get_my_bugs':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.getMyBugs(args.status, args.limit)) }] };
           case 'zentao_get_pending_bugs':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.getPendingBugs(args.limit)) }] };
+            return { content: [{ type: 'text', text: JSON.stringify(await this.getMyBugs(args.status, args.limit)) }] };
           case 'zentao_get_market_defects':
             return { content: [{ type: 'text', text: JSON.stringify(await this.getMarketDefects(args.limit)) }] };
           case 'zentao_get_work_dashboard':
@@ -448,16 +447,6 @@ export class ZentaoMCPServer {
     }
   }
 
-  async getPendingBugs(limit = 20) {
-    await this.ensureLoggedIn();
-    try {
-      const pendingUrl = `${this.baseUrl}/index.php?m=my&f=work&mode=bug&type=assignedTo`;
-      const response = await this.client.get(pendingUrl);
-      return this.parseBugList(response.data, limit, '待处理BUG');
-    } catch (error) {
-      return { success: false, error: error.message, bugs: [] };
-    }
-  }
 
   async getMarketDefects(limit = 20) {
     await this.ensureLoggedIn();
