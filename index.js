@@ -557,89 +557,27 @@ class ZentaoMCPServer {
   }
 
   async getMyBugs(status = 'active', limit = 20) {
+  async getMyBugs(status = 'active', limit = 20) {
     await this.ensureLoggedIn();
 
     try {
-      // 构建查看分配给我的BUG的URL
-      let myBugsUrl = `${this.baseUrl}/index.php?m=bug&f=browse&browseType=assignedTo&param=${this.username}`;
+      // 使用与待处理BUG相同的URL
+      const myBugsUrl = `${this.baseUrl}/index.php?m=my&f=work&mode=bug&type=assignedTo`;
+      console.log(`正在获取我的BUG: ${myBugsUrl}`);
       
-      // 如果指定了状态，添加状态过滤
-      if (status && status !== 'all') {
-        myBugsUrl += `&status=${status}`;
-      }
-
       const response = await this.client.get(myBugsUrl);
-      const $ = cheerio.load(response.data);
-
-      const bugs = [];
-      
-      // 尝试多种表格选择器来提取BUG列表
-      const tableSelectors = [
-        '.table-condensed tbody tr',
-        '.table tbody tr', 
-        '#bugList tbody tr',
-        'table tbody tr'
-      ];
-
-      let foundBugs = false;
-      
-      for (const selector of tableSelectors) {
-        const rows = $(selector);
-        if (rows.length > 0) {
-          rows.each((i, row) => {
-            if (i >= limit) return false;
-            
-            const $row = $(row);
-            const cells = $row.find('td');
-            
-            if (cells.length >= 6) {
-              const bug = {
-                id: cells.eq(0).text().trim(),
-                priority: cells.eq(1).text().trim(),
-                title: cells.eq(2).find('a').text().trim() || cells.eq(2).text().trim(),
-                status: cells.eq(3).text().trim(),
-                assignedTo: cells.eq(4).text().trim(),
-                reporter: cells.eq(5).text().trim(),
-                created: cells.length > 6 ? cells.eq(6).text().trim() : ''
-              };
-              
-              // 只添加有效的BUG（ID不为空且不是表头）
-              if (bug.id && bug.id !== 'ID' && bug.id !== 'Bug' && !isNaN(parseInt(bug.id))) {
-                bugs.push(bug);
-                foundBugs = true;
-              }
-            }
-          });
-          
-          if (foundBugs) break; // 找到数据就停止尝试其他选择器
-        }
+      if (response.status !== 200) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-
-      // 如果没有找到BUG，尝试使用搜索功能作为备选方案
-      if (!foundBugs) {
-        console.error('No bugs found with table selectors, trying search method...');
-        return await this.searchBugs({ assignedTo: this.username, status, limit });
-      }
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify({ 
-              assignedTo: this.username,
-              status: status,
-              bugs, 
-              total: bugs.length,
-              message: `找到 ${bugs.length} 个分配给您的BUG`
-            }, null, 2)
-          }
-        ]
-      };
+      
+      return await this.parseBugList(response.data, limit, '我的BUG');
+      
     } catch (error) {
-      throw new Error(`Failed to get my bugs: ${error.message}`);
+      throw new Error(`获取我的BUG失败: ${error.message}`);
     }
   }
 
+  // 获取工作面板信息
   // 获取工作面板信息
   async getWorkDashboard() {
     await this.ensureLoggedIn();
@@ -656,39 +594,63 @@ class ZentaoMCPServer {
       const $ = cheerio.load(response.data);
       const dashboard = {};
       
-      // 尝试提取我的BUG数量
-      const bugSelectors = [
-        'a[href*="assignedTo"] .number',
-        'a[href*="bug"] .count',
-        '.bug-count',
-        'td:contains("我的BUG") + td',
-        'a[href*="work&mode=bug"] .label-badge'
+      // 调试：输出页面内容的一部分
+      console.log('页面标题:', $('title').text());
+      console.log('页面内容长度:', response.data.length);
+      
+      // 尝试多种方式提取统计信息
+      const selectors = [
+        '.panel-body a',
+        '.dashboard-item',
+        '.my-work a',
+        'a[href*="work"]',
+        'a[href*="bug"]',
+        '.statistic-item'
       ];
       
-      for (const selector of bugSelectors) {
-        const element = $(selector);
-        if (element.length > 0) {
-          dashboard.myBugs = element.text().trim();
-          break;
-        }
+      for (const selector of selectors) {
+        $(selector).each((index, element) => {
+          const $link = $(element);
+          const href = $link.attr('href') || '';
+          const text = $link.text().trim();
+          const number = $link.find('.number, .count, .label-badge, .badge').text().trim();
+          
+          console.log(`链接: ${href}, 文本: ${text}, 数字: ${number}`);
+          
+          if (href.includes('bug') && href.includes('assignedTo')) {
+            dashboard.myBugs = number || text.match(/\d+/)?.[0] || '0';
+          } else if (href.includes('task') && href.includes('assignedTo')) {
+            dashboard.myTasks = number || text.match(/\d+/)?.[0] || '0';
+          } else if (href.includes('story') && href.includes('assignedTo')) {
+            dashboard.myStories = number || text.match(/\d+/)?.[0] || '0';
+          }
+        });
       }
       
-      // 提取其他统计信息
-      $('a[href*="my"]').each((index, element) => {
-        const $link = $(element);
-        const text = $link.text().trim();
-        const number = $link.find('.number, .count, .label-badge').text().trim();
-        
-        if (text && number) {
-          if (text.includes('BUG') || text.includes('bug')) {
-            dashboard.myBugs = number;
-          } else if (text.includes('任务') || text.includes('task')) {
-            dashboard.myTasks = number;
-          } else if (text.includes('需求') || text.includes('story')) {
-            dashboard.myStories = number;
+      // 如果没有找到数据，尝试解析表格
+      if (Object.keys(dashboard).length === 0) {
+        $('table tr').each((index, element) => {
+          const $row = $(element);
+          const cells = $row.find('td');
+          if (cells.length >= 2) {
+            const label = cells.eq(0).text().trim();
+            const value = cells.eq(1).text().trim();
+            console.log(`表格行: ${label} = ${value}`);
+            
+            if (label.includes('BUG') || label.includes('bug')) {
+              dashboard.myBugs = value;
+            } else if (label.includes('任务') || label.includes('task')) {
+              dashboard.myTasks = value;
+            } else if (label.includes('需求') || label.includes('story')) {
+              dashboard.myStories = value;
+            }
           }
-        }
-      });
+        });
+      }
+      
+      // 添加页面原始信息用于调试
+      dashboard.pageTitle = $('title').text();
+      dashboard.pageSize = response.data.length;
       
       return {
         content: [
