@@ -6,7 +6,7 @@ const TEST_CONFIG = {
   baseUrl: process.env.RDMS_BASE_URL || 'https://rdms.streamax.com',
   username: process.env.RDMS_USERNAME || 'jiangyuanchen',
   password: process.env.RDMS_PASSWORD || 'Rm123456',
-  testBugId: process.env.TEST_BUG_ID || '141480',
+  testBugId: process.env.TEST_BUG_ID || '138363',
   testMarketBugId: process.env.TEST_MARKET_BUG_ID || '11636',
   testImageUrl: process.env.TEST_IMAGE_URL || 'https://rdms.streamax.com/index.php?m=file&f=read&t=png&fileID=411376'
 };
