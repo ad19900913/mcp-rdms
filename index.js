@@ -78,19 +78,6 @@ export class RDMSMCPServer {
     this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
       tools: [
         {
-          name: 'rdms_login',
-          description: 'Login to RDMS system. Once logged in successfully, the session cookies will be automatically cached and reused for all subsequent API calls. You only need to call this once per session - the system will automatically handle authentication for future requests using the cached cookies. If a session expires, the system will attempt auto-login using stored credentials.',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              baseUrl: { type: 'string', description: 'RDMS base URL' },
-              username: { type: 'string', description: 'Username' },
-              password: { type: 'string', description: 'Password' }
-            },
-            required: ['baseUrl', 'username', 'password']
-          }
-        },
-        {
           name: 'rdms_get_bug',
           description: 'Get bug details by ID with image extraction. Returns bug information including image URLs but NOT image content. If you need to analyze image content, use the rdms_download_image tool with the returned image URLs.',
           inputSchema: {
@@ -154,8 +141,6 @@ export class RDMSMCPServer {
 
       try {
         switch (name) {
-          case 'rdms_login':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.login(args.baseUrl, args.username, args.password)) }] };
           case 'rdms_get_bug':
             return { content: [{ type: 'text', text: JSON.stringify(await this.getBug(args.bugId)) }] };
           case 'rdms_get_market_bug':
@@ -246,17 +231,59 @@ export class RDMSMCPServer {
       
       const $ = cheerio.load(response.data);
       
+      // 初始化完整的响应结构
       const bugInfo = {
         id: bugId,
-        title: $('title').text().replace(/^BUG #\d+\s*/, '').replace(/\s*-.*$/, '').trim() || 
-               $('.page-title, h1').text().trim(),
-        status: '', priority: '', severity: '', assignedTo: '', reporter: '',
-        product: '', project: '', module: '', version: '', os: '', browser: '',
-        steps: '', description: '', keywords: '', created: '', updated: '',
+        title: '',
+        status: '',
+        priority: '',
+        severity: '',
+        confirmed: '',
+        assignedTo: '',
+        reporter: '',
+        createdBy: '',
+        resolvedBy: '',
+        closedBy: '',
+        cc: '',
+        product: '',
+        project: '',
+        module: '',
+        version: '',
+        affectedVersion: '',
+        resolvedVersion: '',
+        os: '',
+        browser: '',
+        platformDevice: '',
+        bugType: '',
+        plan: '',
+        attribution: '',
+        attributionTeam: '',
+        valueAttribute: '',
+        activationCount: '',
+        activationDate: '',
+        probability: '',
+        commonIssue: '',
+        execution: '',
+        requirement: '',
+        task: '',
+        relatedBugs: '',
+        relatedCases: '',
+        deadline: '',
+        created: '',
+        updated: '',
+        lastModified: '',
+        steps: '',
+        description: '',
+        keywords: '',
+        solution: '',
         images: []
       };
 
-      // Extract images
+      // 提取标题
+      bugInfo.title = $('title').text().replace(/^BUG #\d+\s*/, '').replace(/\s*-.*$/, '').trim() || 
+                     $('.page-title, h1').text().trim();
+
+      // 提取图片
       $('img').each((i, img) => {
         const src = $(img).attr('src');
         if (src && !src.includes('data:') && !src.includes('base64')) {
@@ -265,7 +292,59 @@ export class RDMSMCPServer {
         }
       });
 
-      // Extract bug fields using multiple strategies
+      // 字段映射表 - 中文标签到英文字段的映射
+      const fieldMapping = {
+        '状态': 'status',
+        'Bug状态': 'status',
+        '优先级': 'priority',
+        '严重程度': 'severity',
+        '是否确认': 'confirmed',
+        '指派给': 'assignedTo',
+        '由谁创建': 'reporter',
+        '创建者': 'createdBy',
+        '报告人': 'reporter',
+        '解决者': 'resolvedBy',
+        '关闭者': 'closedBy',
+        '抄送给': 'cc',
+        '所属产品': 'product',
+        '所属项目': 'project',
+        '所属模块': 'module',
+        '影响版本': 'version',
+        '版本': 'affectedVersion',
+        '解决版本': 'resolvedVersion',
+        '操作系统': 'os',
+        '浏览器': 'browser',
+        '平台/设备': 'platformDevice',
+        'Bug类型': 'bugType',
+        '类型': 'bugType',
+        '计划': 'plan',
+        '所属计划': 'plan',
+        '归属': 'attribution',
+        '归属团队': 'attributionTeam',
+        '价值属性': 'valueAttribute',
+        '激活次数': 'activationCount',
+        '激活日期': 'activationDate',
+        '出现概率': 'probability',
+        '常见问题': 'commonIssue',
+        '执行': 'execution',
+        '需求': 'requirement',
+        '关联需求': 'requirement',
+        '任务': 'task',
+        '关联任务': 'task',
+        '相关Bug': 'relatedBugs',
+        '相关用例': 'relatedCases',
+        '截止日期': 'deadline',
+        '创建时间': 'created',
+        '更新时间': 'updated',
+        '最后修改': 'lastModified',
+        '重现步骤': 'steps',
+        '详细描述': 'description',
+        '描述': 'description',
+        '关键词': 'keywords',
+        '解决方案': 'solution'
+      };
+
+      // 从表格中提取字段
       $('table tr, .table tr').each((i, row) => {
         const $row = $(row);
         const cells = $row.find('td, th');
@@ -273,39 +352,65 @@ export class RDMSMCPServer {
           const label = cells.eq(0).text().trim();
           const value = cells.eq(1).text().trim();
           
-          if (label.includes('状态') || label.includes('Bug状态')) bugInfo.status = value;
-          if (label.includes('优先级')) bugInfo.priority = value;
-          if (label.includes('严重程度')) bugInfo.severity = value;
-          if (label.includes('指派给')) bugInfo.assignedTo = value;
-          if (label.includes('由谁创建') || label.includes('创建者')) bugInfo.reporter = value;
-          if (label.includes('所属产品')) bugInfo.product = value;
-          if (label.includes('所属项目')) bugInfo.project = value;
-          if (label.includes('所属模块')) bugInfo.module = value;
-          if (label.includes('影响版本')) bugInfo.version = value;
+          // 查找匹配的字段
+          for (const [chineseLabel, englishField] of Object.entries(fieldMapping)) {
+            if (label.includes(chineseLabel) && value) {
+              bugInfo[englishField] = value;
+              break;
+            }
+          }
         }
       });
 
-      // Alternative extraction method
-      const keywords = ['状态', '优先级', '严重程度', '指派给'];
-      keywords.forEach(keyword => {
-        const elements = $(`*:contains("${keyword}")`);
-        elements.each((i, el) => {
-          const $el = $(el);
-          const parent = $el.parent();
-          const siblings = parent.find('td, span, div').not($el);
-          if (siblings.length > 0) {
-            const value = siblings.first().text().trim();
-            if (value && !bugInfo[keyword === '状态' ? 'status' : 
-                                keyword === '优先级' ? 'priority' : 
-                                keyword === '严重程度' ? 'severity' : 'assignedTo']) {
-              if (keyword === '状态') bugInfo.status = value;
-              if (keyword === '优先级') bugInfo.priority = value;
-              if (keyword === '严重程度') bugInfo.severity = value;
-              if (keyword === '指派给') bugInfo.assignedTo = value;
+      // 使用CSS选择器进一步提取字段
+      Object.entries(fieldMapping).forEach(([chineseLabel, englishField]) => {
+        if (!bugInfo[englishField]) {
+          // 查找包含中文标签的元素
+          const elements = $(`*:contains("${chineseLabel}")`);
+          elements.each((i, el) => {
+            const $el = $(el);
+            const text = $el.text().trim();
+            
+            // 如果元素只包含标签文本，查找相邻元素的值
+            if (text === chineseLabel || text === chineseLabel + ':' || text === chineseLabel + '：') {
+              const nextSibling = $el.next();
+              const parent = $el.parent();
+              const parentSiblings = parent.next();
+              
+              let value = '';
+              if (nextSibling.length && nextSibling.text().trim()) {
+                value = nextSibling.text().trim();
+              } else if (parentSiblings.length && parentSiblings.text().trim()) {
+                value = parentSiblings.text().trim();
+              } else {
+                // 查找同一行的其他单元格
+                const row = $el.closest('tr');
+                const cells = row.find('td');
+                if (cells.length > 1) {
+                  value = cells.eq(1).text().trim();
+                }
+              }
+              
+              if (value && value !== chineseLabel) {
+                bugInfo[englishField] = value;
+                return false; // 找到后停止查找
+              }
             }
-          }
-        });
+          });
+        }
       });
+
+      // 特殊处理一些字段
+      // 提取步骤和描述（通常在较大的文本区域中）
+      if (!bugInfo.steps) {
+        const stepsArea = $('.steps, .reproduce-steps, [name*="steps"]').text().trim();
+        if (stepsArea) bugInfo.steps = stepsArea;
+      }
+      
+      if (!bugInfo.description) {
+        const descArea = $('.description, .bug-description, [name*="desc"]').text().trim();
+        if (descArea) bugInfo.description = descArea;
+      }
 
       return bugInfo;
     } catch (error) {
@@ -321,35 +426,165 @@ export class RDMSMCPServer {
       
       const marketBugInfo = {
         id: marketBugId,
-        title: $('.page-title').text().trim() || $('title').text().trim(),
-        status: '', priority: '', severity: '', assignedTo: '', reporter: '',
-        product: '', project: '', module: '', version: '', created: '', updated: '',
-        images: []
+        title: $('.page-title .text').text().trim() || $('.page-title').text().trim() || $('title').text().trim(),
+        status: '',
+        priority: '',
+        severity: '',
+        assignedTo: '',
+        reporter: '',
+        product: '',
+        productLine: '',
+        productVersion: '',
+        productSystem: '',
+        project: '',
+        module: '',
+        version: '',
+        created: '',
+        updated: '',
+        region: '',
+        customerCode: '',
+        customerName: '',
+        expectedSolveDate: '',
+        problemLevel: '',
+        frontTechSupport: '',
+        defectDescription: '',
+        temporaryResponse: '',
+        solution: '',
+        defectAttribution: '',
+        defectType: '',
+        planFixTime: '',
+        problemAttributionTeam: '',
+        locationProblem: '',
+        confirmed: '',
+        solveDate: '',
+        closeDate: '',
+        submitPage: '',
+        images: [],
+        history: []
       };
 
-      // Extract images
-      $('img').each((i, img) => {
-        const src = $(img).attr('src');
-        if (src && !src.includes('data:') && !src.includes('base64')) {
-          const fullUrl = src.startsWith('http') ? src : `${this.baseUrl}${src}`;
-          marketBugInfo.images.push(fullUrl);
+      // 提取基本标题信息
+      const titleElement = $('.page-title .text');
+      if (titleElement.length) {
+        marketBugInfo.title = titleElement.text().trim();
+      }
+
+      // 提取产品信息
+      $('.detail-title').each((i, titleEl) => {
+        const $title = $(titleEl);
+        const titleText = $title.text().trim();
+        const $content = $title.next('.detail-content');
+        
+        if (titleText === '产品信息') {
+          $content.find('tr').each((j, row) => {
+            const $row = $(row);
+            const cells = $row.find('th, td');
+            
+            for (let k = 0; k < cells.length; k += 2) {
+              const label = $(cells[k]).text().trim();
+              const value = $(cells[k + 1]).text().trim();
+              
+              if (label === '产品线') marketBugInfo.productLine = value;
+              if (label === '所属产品') marketBugInfo.product = value;
+              if (label === '产品问题版本号') marketBugInfo.productVersion = value;
+              if (label === '产品系统组成') marketBugInfo.productSystem = value;
+            }
+          });
+        }
+        
+        if (titleText === '客户信息') {
+          $content.find('tr').each((j, row) => {
+            const $row = $(row);
+            const cells = $row.find('th, td');
+            
+            for (let k = 0; k < cells.length; k += 2) {
+              const label = $(cells[k]).text().trim();
+              const value = $(cells[k + 1]).text().trim();
+              
+              if (label === '所属大区') marketBugInfo.region = value;
+              if (label === '客户代码') marketBugInfo.customerCode = value;
+              if (label === '客户名称') marketBugInfo.customerName = value;
+              if (label === '期望解决日期') marketBugInfo.expectedSolveDate = value;
+            }
+          });
+        }
+        
+        if (titleText === '缺陷信息') {
+          $content.find('tr').each((j, row) => {
+            const $row = $(row);
+            const cells = $row.find('th, td');
+            
+            for (let k = 0; k < cells.length; k += 2) {
+              const label = $(cells[k]).text().trim();
+              const value = $(cells[k + 1]).text().trim();
+              
+              if (label === '问题级别') marketBugInfo.problemLevel = value;
+              if (label === '前方技术支持') marketBugInfo.frontTechSupport = value;
+              if (label === '缺陷描述') {
+                marketBugInfo.defectDescription = $(cells[k + 1]).find('.detail-content').text().trim() || value;
+              }
+            }
+          });
+        }
+        
+        if (titleText === '解决方案') {
+          marketBugInfo.solution = $content.text().trim();
+        }
+        
+        if (titleText === '缺陷归属') {
+          marketBugInfo.defectAttribution = $content.text().trim();
         }
       });
 
-      // Extract market bug fields
-      $('.table-form tr, .detail tr').each((i, row) => {
+      // 提取右侧基本信息 - 使用更宽泛的选择器
+      $('.side-col table tr, #legendBasicInfo table tr, .table-data tr').each((i, row) => {
         const $row = $(row);
-        const label = $row.find('th, .label').text().trim();
-        const value = $row.find('td:not(.label)').text().trim();
+        const label = $row.find('th').text().trim();
+        const value = $row.find('td').text().trim();
         
-        if (label.includes('状态') || label.includes('Status')) marketBugInfo.status = value;
-        if (label.includes('优先级') || label.includes('Priority')) marketBugInfo.priority = value;
-        if (label.includes('严重程度') || label.includes('Severity')) marketBugInfo.severity = value;
-        if (label.includes('指派给') || label.includes('AssignedTo')) marketBugInfo.assignedTo = value;
-        if (label.includes('由谁创建') || label.includes('Reporter')) marketBugInfo.reporter = value;
-        if (label.includes('所属产品') || label.includes('Product')) marketBugInfo.product = value;
-        if (label.includes('所属项目') || label.includes('Project')) marketBugInfo.project = value;
-        if (label.includes('所属模块') || label.includes('Module')) marketBugInfo.module = value;
+        if (label === '缺陷状态') marketBugInfo.status = value;
+        if (label === '缺陷类型') marketBugInfo.defectType = value;
+        if (label === '优先级') marketBugInfo.priority = value;
+        if (label === '严重程度') marketBugInfo.severity = value;
+        if (label === '指派给') marketBugInfo.assignedTo = value;
+        if (label === '由谁创建') marketBugInfo.reporter = value;
+        if (label === '创建日期') marketBugInfo.created = value;
+        if (label === '最后修改') marketBugInfo.updated = value;
+        if (label === '计划修复时间') marketBugInfo.planFixTime = value;
+        if (label === '问题归属团队') marketBugInfo.problemAttributionTeam = value;
+        if (label === '定位问题') marketBugInfo.locationProblem = value;
+        if (label === '是否确认') marketBugInfo.confirmed = value;
+        if (label === '解决日期') marketBugInfo.solveDate = value;
+        if (label === '关闭日期') marketBugInfo.closeDate = value;
+        if (label === '提交页面') marketBugInfo.submitPage = value;
+        
+        // 处理一些可能的字段变体
+        if (label.includes('所属项目') && value && value !== '') marketBugInfo.project = value;
+        if (label.includes('所属模块') && value && value !== '') marketBugInfo.module = value;
+        if (label.includes('版本') && value && value !== '') marketBugInfo.version = value;
+      });
+
+      // 提取历史记录
+      $('.histories-list li').each((i, historyItem) => {
+        const $item = $(historyItem);
+        const historyText = $item.clone().children().remove().end().text().trim();
+        const comment = $item.find('.comment-content').text().trim();
+        
+        if (historyText) {
+          marketBugInfo.history.push({
+            action: historyText,
+            comment: comment || null
+          });
+        }
+      });
+
+      // 提取图片
+      $('img').each((i, img) => {
+        const src = $(img).attr('src');
+        if (src && !src.includes('data:') && !src.includes('base64') && !src.includes('theme/') && !src.includes('icon')) {
+          const fullUrl = src.startsWith('http') ? src : `${this.baseUrl}${src}`;
+          marketBugInfo.images.push(fullUrl);
+        }
       });
 
       return marketBugInfo;

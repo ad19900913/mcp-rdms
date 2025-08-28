@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang='zh-cn'>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="renderer" content="webkit">
+  <title>BUG #11636 133044-FT3.17.4-车辆实时司机绑定错误，没有绑定到实时识别通过的司机上 - 锐明RDMS</title>
+<script>window.config={"webRoot":"\/","debug":true,"appName":"","cookieLife":30,"requestType":"GET","requestFix":"-","moduleVar":"m","methodVar":"f","viewVar":"t","defaultView":"html","themeRoot":"\/theme\/","currentModule":"bugmarket","currentMethod":"view","clientLang":"zh-cn","requiredFields":"","router":"\/index.php","save":"\u4fdd\u5b58","runMode":"","timeout":0,"pingInterval":""};
+window.lang={"submitting":"\u7a0d\u5019...","save":"\u4fdd\u5b58","expand":"\u5c55\u5f00\u5168\u90e8","timeout":"\u8fde\u63a5\u8d85\u65f6\uff0c\u8bf7\u68c0\u67e5\u7f51\u7edc\u73af\u5883\uff0c\u6216\u91cd\u8bd5\uff01"};
+
+</script>
+<script>config.onlybody = "no";</script><link rel='stylesheet' href='/theme/zui/css/min.css?t=1756351355?v=15.5' type='text/css' media='screen' />
+<link rel='stylesheet' href='/theme/default/style.css?t=1756351355?v=15.5' type='text/css' media='screen' />
+<link rel='stylesheet' href='/theme/lang/zh-cn.css?v=15.5' type='text/css' media='screen' />
+<script src='/js/jquery/lib.js?v=15.5'></script>
+<script src='/js/zui/min.js?t=1756351355&v=15.5'></script>
+<script src='/js/my.full.js?t=1756351355&v=15.5'></script>
+<style>.ke-toolbar .ke-outline[data-name='savetemplate'] {display: none;}
+#modulemenu .nav #dropMenu #searchResult .closed {text-decoration: none;}
+.nav #moreMenus {cursor: pointer;}
+
+#batchCreateForm .input-group, #batchEditForm .input-group,
+#batchCreateForm .input-group .form-control, #batchEditForm .input-group .form-control {position: static;}
+#batchCreateForm .input-group .colorpicker, #batchEditForm .input-group .colorpicker {z-index: 2;}
+#batchCreateForm .input-group .colorpicker.open, #batchEditForm .input-group .colorpicker.open {z-index: 5;}
+.content .stepTitle {display: block; color: green; margin: 0px;}
+.table-fixed td {white-space: unset;}
+.table-data tr > td {word-break: break-all; word-wrap: break-word;}
+.side-col .cell {padding: 0px;}
+.tab-pane table {border: 1px solid #ddd; border-top: none;}#legendBasicInfo .thWidth {width: 70px !important;}
+#legendLife .thWidth {width: 90px !important;}
+</style><link rel='icon' href='/favicon.ico' type='image/x-icon' />
+<link rel='shortcut icon' href='/favicon.ico' type='image/x-icon' />
+<!--[if lt IE 10]>
+<script src='/js/jquery/placeholder/min.js?v=15.5'></script>
+<![endif]-->
+</head>
+<body class=''>
+<link rel='stylesheet' href='/js/zui/picker/zui.picker.min.css?v=15.5' type='text/css' media='screen' />
+<script src='/js/zui/picker/zui.picker.min.js?v=15.5'></script>
+<style>
+.picker-single .picker-selection-remove{z-index: 1000;}
+.picker-selection-single:after, .picker-multi.picker-focus .picker-selections:before{font-family: ZentaoIcon !important; content: '\f0d7' !important;}
+</style>
+<script>
+var chooseUsersToMail = '选择要发信通知的用户...';
+if($.fn.picker)
+{
+    $(document).ready(function()
+    {
+        $(".picker-select[data-pickertype!='remote']").picker({chosenMode: true});
+        $("[data-pickertype='remote']").each(function()
+        {
+            var pickerremote = $(this).attr('data-pickerremote');
+            $(this).picker({chosenMode: true, remote: pickerremote});
+        })
+    });
+}
+</script>
+<header id='header'>
+  <div id='mainHeader'>
+    <div class='container'>
+      <div id='heading'>
+        <div class='btn-group header-btn'><a href='/index.php?m=bugmarket&f=browse' class='btn' style='padding-top: 2px'><i class='icon icon-cube'></i> 市场缺陷</a>
+</div>              </div>
+      <nav id='navbar'><ul class='nav nav-default'>
+</ul>
+</nav>
+      <div id='toolbar'>
+        <div id='userMenu'>
+          <ul id="userNav" class="nav nav-default">
+            <li class='dropdown dropdown-hover has-avatar'><a class='dropdown-toggle' data-toggle='dropdown'><div class='avatar has-text avatar-circle'  style='background: hsl(187, 40%, 60%);'><span>J</span></div></a><ul class='dropdown-menu pull-right'><li class="user-profile-item"><a href='/index.php?m=my&f=profile&onlybody=yes' data-width='600' class='iframe '><div class='avatar has-text avatar-circle' id="menu-avatar" style='background: hsl(187, 40%, 60%);'><span>J</span></div><div class="user-profile-name">江原臣</div><div class="user-profile-role">研发主管</div></a></li><li class="divider"></li><li><a href='/index.php?m=my&f=profile&onlybody=yes' class='iframe' data-width='600'><i class='icon icon-account'></i> 个人档案</a>
+</li><li><a href='/index.php?m=tutorial&f=start' class='iframe' data-class-name='modal-inverse' data-width='800' data-headerless='true' data-backdrop='true' data-keyboard='true'><i class='icon icon-guide'></i> 新手引导</a>
+</li><li><a href='/index.php?m=my&f=preference&onlybody=yes' class='iframe' data-width='650'><i class='icon icon-controls'></i> 个性化设置</a>
+</li><li><a href='/index.php?m=my&f=changepassword&onlybody=yes' class='iframe' data-width='600'><i class='icon icon-cog-outline'></i> 修改密码</a>
+</li><li class='divider'></li><li class='dropdown-submenu top'><a href='javascript:;'><i class='icon icon-theme'></i> 主题</a><ul class='dropdown-menu pull-left'><li class='selected'><a href='javascript:selectTheme("default");' data-value='default'>禅道蓝（默认）</a></li><li ><a href='javascript:selectTheme("blue");' data-value='blue'>青春蓝</a></li><li ><a href='javascript:selectTheme("green");' data-value='green'>叶兰绿</a></li><li ><a href='javascript:selectTheme("red");' data-value='red'>赤诚红</a></li><li ><a href='javascript:selectTheme("purple");' data-value='purple'>玉烟紫</a></li><li ><a href='javascript:selectTheme("pink");' data-value='pink'>芙蕖粉</a></li><li ><a href='javascript:selectTheme("blackberry");' data-value='blackberry'>露莓黑</a></li><li ><a href='javascript:selectTheme("classic");' data-value='classic'>经典蓝</a></li></ul></li><li class='dropdown-submenu top'><a href='javascript:;'><i class='icon icon-lang'></i> Language</a><ul class='dropdown-menu pull-left'><li class='selected'><a href='javascript:selectLang("zh-cn");'>简体</a></li><li ><a href='javascript:selectLang("zh-tw");'>繁體</a></li><li ><a href='javascript:selectLang("en");'>English</a></li></ul></li><li class='dropdown-submenu'><a data-toggle='dropdown'><i class='icon icon-help'></i> 帮助</a><ul class='dropdown-menu pull-left'><li><a href='https://www.zentao.net/book/zentaopmshelp.html?fullScreen=zentao&theme=default' class='open-in-app' id='helpLink' data-app='help'>手册</a>
+</li><li><a href='/index.php?m=misc&f=changeLog' class='iframe' data-width='800' data-headerless='true' data-backdrop='true' data-keyboard='true'>修改日志</a>
+</li></ul></li>
+<li><a href='/index.php?m=misc&f=about' class='about iframe' data-width='1050' data-headerless='true' data-backdrop='true' data-keyboard='true' data-class='modal-about'><i class='icon icon-about'></i> 关于禅道</a>
+</li><li><a href='https://api.zentao.net/goto.php?item=aiux' class='link-aiux' target='_blank'><i class='icon icon-aiux'></i> 艾体验设计</a></li><li class="divider"></li><li><a href='/index.php?m=user&f=logout'  target='_top'><i class='icon icon-exit'></i> 退出</a>
+</li></ul></li>
+            <li class='dropdown dropdown-hover' id='globalCreate'><a class='dropdown-toggle' data-toggle='dropdown'><i class='icon icon-plus-solid-circle text-secondary'></i></a><ul class='dropdown-menu pull-right create-list'><li><a href='/index.php?m=todo&f=create' ><i class='icon icon-todo'></i> 待办</a>
+</li><li class="divider"></li><li><a href='/index.php?m=bug&f=create&productID=43&branch=&extras=from=global' ><i class='icon icon-bug'></i> Bug</a>
+</li><li><a href='/index.php?m=story&f=create&productID=43&branch=0&moduleID=0&storyID=0&objectID=0&bugID=0&planID=0&todoID=0&extra=from=global' ><i class='icon icon-lightbulb'></i> 需求</a>
+</li><li><a href='/index.php?m=task&f=create&executionID=0&storyID=0&moduleID=0&taskID=0&todoID=0&extra=from=global' ><i class='icon icon-check-sign'></i> 任务</a>
+</li><li><a href='/index.php?m=testcase&f=create&productID=43&branch=&moduleID=0&from=&param=0&storyID=0&extras=from=global' ><i class='icon icon-sitemap'></i> 用例</a>
+</li><li><a href='/index.php?m=doc&f=selectLibType&objectType=&objectID=0&libID=0&onlybody=yes' class='iframe' data-width='650px'><i class='icon icon-doc'></i> 文档</a>
+</li><li class="divider"></li><li><a href='/index.php?m=execution&f=create&projectID=&executionID=0&copyExecutionID=0&planID=0&confirm=no&productID=0&extra=from=global' ><i class='icon icon-run'></i> 执行</a>
+</li><li><a href='/index.php?m=project&f=create&model=scrum&programID=0&copyProjectID=0&extra=from=global' ><i class='icon icon-project'></i> 项目</a>
+</li></ul></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+    </header>
+
+<script>
+adjustMenuWidth();
+</script>
+<main id='main'  >
+  <div class='container'>
+<script src='/js/kindeditor/kindeditor.min.js?v=15.5'></script>
+<script src='/js/kindeditor/lang/zh_CN.js?v=15.5'></script>
+<script>
+(function($) {
+    var kuid = '68afcb7b883bd';
+    var editor = {"id":["comment","lastComment"],"tools":"bugTools"};
+    var K = KindEditor;
+
+    var bugTools =
+    [ 'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic','underline', '|',
+    'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist', 'insertunorderedlist', '|',
+    'emoticons', 'image', 'code', 'link', '|', 'removeformat','undo', 'redo', 'fullscreen', 'source', 'about'];
+    var simpleTools =
+    [ 'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic','underline', '|',
+    'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist', 'insertunorderedlist', '|',
+    'emoticons', 'image', 'code', 'link', 'table', '|', 'removeformat','undo', 'redo', 'fullscreen', 'source', 'about'];
+    var fullTools =
+    [ 'formatblock', 'fontname', 'fontsize', 'lineheight', '|', 'forecolor', 'hilitecolor', '|', 'bold', 'italic','underline', 'strikethrough', '|',
+    'justifyleft', 'justifycenter', 'justifyright', 'justifyfull', '|',
+    'insertorderedlist', 'insertunorderedlist', '|',
+    'emoticons', 'image', 'insertfile', 'hr', '|', 'link', 'unlink', '/',
+    'undo', 'redo', '|', 'selectall', 'cut', 'copy', 'paste', '|', 'plainpaste', 'wordpaste', '|', 'removeformat', 'clearhtml','quickformat', '|',
+    'indent', 'outdent', 'subscript', 'superscript', '|',
+    'table', 'code', '|', 'pagebreak', 'anchor', '|',
+    'fullscreen', 'source', 'preview', 'about'];
+    var editorToolsMap = {fullTools: fullTools, simpleTools: simpleTools, bugTools: bugTools};
+
+    /* Kindeditor default options. */
+    var editorDefaults =
+    {
+        cssPath: [config.themeRoot + 'zui/css/min.css'],
+        width: '100%',
+        height: '200px',
+        filterMode: true,
+        bodyClass: 'article-content',
+        urlType: 'absolute',
+        uploadJson: createLink('file', 'ajaxUpload', 'uid=' + kuid),
+        langType: 'zh_CN',
+        cssData: 'html,body {background: none}.article-content{overflow:visible}.article-content, .article-content table td, .article-content table th {line-height: 1.3846153846; font-size: 13px;}.article-content .table-auto {width: auto!important; max-width: 100%;} ',
+        placeholder: "\u53ef\u4ee5\u5728\u7f16\u8f91\u5668\u76f4\u63a5\u8d34\u56fe\u3002",
+        placeholderStyle: {fontSize: '13px', color: '#888'},
+        pasteImage: {postUrl: createLink('file', 'ajaxPasteImage', 'uid=' + kuid)},
+        syncAfterBlur: true,
+        allowFileManager: false,
+        spellcheck: false
+    };
+
+    window.editor = {};
+
+    /* Init kindeditor. */
+    var setKindeditor = function(element, options)
+    {
+        var $editor  = $(element);
+        var pasted   = false;
+        var editorID = $editor.attr('id');
+        options      = $.extend({}, editorDefaults, $editor.data(), options);
+        if(editorID === undefined)
+        {
+            editorID = 'kindeditor-' + $.zui.uuid();
+            $editor.attr('id', editorID);
+        }
+
+        var editorTool  = editorToolsMap[options.tools || editor.tools] || simpleTools;
+
+        /* Remove fullscreen in modal. */
+        if(config.onlybody == 'yes')
+        {
+            var newEditorTool = new Array();
+            for(i in editorTool)
+            {
+                if(editorTool[i] != 'fullscreen') newEditorTool.push(editorTool[i]);
+            }
+            editorTool = newEditorTool;
+        }
+
+        $.extend(options,
+        {
+            items: editorTool,
+            placeholder: $editor.attr('placeholder') || options.placeholder || '',
+            pasteImage: {postUrl: createLink('file', 'ajaxPasteImage', 'uid=' + kuid), placeholder: $editor.attr('placeholder') || "\u53ef\u4ee5\u5728\u7f16\u8f91\u5668\u76f4\u63a5\u8d34\u56fe\u3002"},
+        });
+
+        try
+        {
+            var keditor = K.create('#' + editorID, options);
+            window.editor['#'] = window.editor[editorID] = keditor;
+            $editor.data('keditor', keditor);
+            return keditor;
+        }
+        catch(e){return false;}
+    };
+
+    /* Init kindeditor with jquery way. */
+    $.fn.kindeditor = function(options)
+    {
+        return this.each(function()
+        {
+            setKindeditor(this, options);
+        });
+    };
+
+    /* Init all kindeditor. */
+    var initKindeditor = function(afterInit)
+    {
+        var $submitBtn = $('form :input[type=submit]');
+        if($submitBtn.length)
+        {
+            $submitBtn.next('#uid').remove();
+            $submitBtn.after("<input type='hidden' id='uid' name='uid' value=" + kuid + ">");
+        }
+        if($.isFunction(afterInit)) afterInit();
+        $.each(editor.id, function(key, editorID)
+        {
+            setKindeditor('#' + editorID);
+        });
+    };
+
+    /* Init all kindeditors when document is ready. */
+    $(initKindeditor);
+}(jQuery));
+</script>
+<script>sysurl = "https:\/\/rdms.streamax.com";</script>
+<div id="mainMenu" class="clearfix">
+    <div class="btn-toolbar pull-left">
+                    <a href='/index.php?m=bugmarket&f=browse&productid=0&branch=0&browseType=aboutme' class='btn btn-secondary'><i class="icon icon-back icon-sm"></i> 返回</a>
+            <div class="divider"></div>
+                <div class="page-title">
+            <span class="label label-id">11636</span>
+            <span class="text" title="133044-FT3.17.4-车辆实时司机绑定错误，没有绑定到实时识别通过的司机上" style='color: '>133044-FT3.17.4-车辆实时司机绑定错误，没有绑定到实时识别通过的司机上</span>
+                    </div>
+    </div>
+            <div class="btn-toolbar pull-right">
+            <button type="button" class="btn btn-primary" data-toggle="popover" data-placement="bottom" data-html="true" data-content="<img src='/theme/default/images/main/bugmarket.png ' >" title="查看流程图">查看流程图</button>
+                                                                </div>
+    </div>
+<div id="mainContent" class="main-row">
+    <div class="main-col col-8">
+        <!--市场缺陷-->
+        <div class="cell" >
+            <div class="detail">
+                <div class="detail-title" style="text-align: left">产品信息</div>
+                <div class="detail-content article-content">
+                    <table class="table table-form" style="font-size: 12px;">
+                        <tr>
+                            <th>产品线</th>
+                            <td>货运</td>
+                            <th>所属产品</th>
+                            <td>FT-V3.X</td>
+                                                            <th>产品问题版本号</th>
+                                <td></td>
+                                                    </tr>
+                        <tr>
+                            <th>产品系统组成</th>
+                            <td colspan="5">FT3.17.4</td>
+                        </tr>
+
+                    </table>
+                </div>
+                <div class="detail-title" style="text-align: left">客户信息</div>
+                <div class="detail-content article-content">
+                    <table class="table table-form" style="font-size: 12px;">
+                        <tr>
+                            <th>所属大区</th>
+                            <td>拉美战区</td>
+                            <th>客户代码</th>
+                            <td>133044</td>
+                            <th>客户名称</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>期望解决日期</th>
+                            <td colspan="5">2025-08-25 00:00:00</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="detail-title" style="text-align: left">缺陷信息</div>
+                <div class="detail-content article-content">
+                    <table class="table table-form" style="font-size: 12px;">
+                        <tr>
+                            <th>问题级别</th>
+                            <td>C</td>
+                            <th>前方技术支持</th>
+                            <td colspan="3"> 方仕春</td>
+                        </tr>
+                        <tr>
+                            <th>缺陷描述</th>
+                            <td colspan="5">
+                                <div class="detail-content article-content">
+                                    <p>当前链接：<a href='https://streamaxamerica.atlassian.net/jira/servicedesk/projects/LSC/queues/custom/249/LSC-84' target='_blank'>https://streamaxamerica.atlassian.net/jira/servicedesk/projects/LSC/queues/custom/249/LSC-84</a></p><p>平台类问题：</p><p>一、客户环境（如：版本配套信息&lt;如： S17版本号、设备型号及版本号、插件版本号等&gt;、服务器IP地址账号密码（为了信息安全，请单独发送给接口人）、客户端登陆账号密码、数据库名称&amp;版本信息等）</p><p> <a href="https://www.smartcamera.michelin.com/" target="_blank" rel="noreferrer noopener">https://www.smartcamera.michelin.com/</a> </p><p>用户名和密码私发（可以使用之前提供的账号查看该车数据）</p><p>车牌号:MLL3579</p><p>查看车辆司机对比记录：对比通过的司机名称都是“<span style="color:rgba(0,0,0,0.85);background-color:rgb(255,255,255);font-size:16px;">EDIVALDO FELIPE DOS SANTOS</span>”</p><p><img src="https://jr.streamax.com/front/attachments/4646dd7daf174a5799ff18dd2df2baa3?clientId=f908a80a-fb5b-4041-9731-6f4444bd08dd" alt="image.png" /></p><p>但是查看车辆行程：绑定都是另外一个司机“<span style="color:rgba(0,0,0,0.85);background-color:rgb(255,255,255);font-size:14px;">WILLIAN CESAR CAMARGO DA SILVA</span>”，为什么会绑定到另外的司机？</p><p>也查询了，这个车没有任何inutton签到记录，所以不会是Ibutton司机</p><p><img src="https://jr.streamax.com/front/attachments/da31b15a9a584a71a4053615a40e23a1?clientId=f908a80a-fb5b-4041-9731-6f4444bd08dd" alt="image.png" /></p>                                                                    </div>
+                                                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+        <!--临时响应-->
+                <div class="cell">
+            <div class="detail">
+                                                                            </div>
+        </div>
+                <!--解决方案-->
+        <div class="cell">
+            <div class="detail">
+                <div class="detail-title">解决方案</div>
+                <div class="detail-content article-content"></div>
+                                    <div class="detail-title">缺陷归属</div>
+                    <div class="detail-content article-content"></div>
+                                            </div>
+                                </div>
+
+                <div class='cell'><div class="detail histories" id='actionbox'
+style="padding: 10px;border-radius: 4px;margin: 0;border: 1px solid #eee;"
+data-textDiff="文本格式" data-original="原始格式">
+<style>.histories-list > li{word-break: break-word; word-wrap: break-word;}</style>
+  <script>
+  $(function()
+  {
+      var diffButton = '<button type="button" class="btn btn-mini btn-icon btn-strip"><i class="icon icon-code icon-sm"></i></button>';
+      var newBoxID = '';
+      var oldBoxID = '';
+      $('blockquote.textdiff').each(function()
+      {
+          newBoxID = $(this).parent().attr('id');
+          if(newBoxID != oldBoxID)
+          {
+              oldBoxID = newBoxID;
+              if($(this).html() != $(this).next().html()) $(this).closest('.history-changes').before(diffButton);
+          }
+      });
+  });
+  </script>
+    <div class="detail-title">
+      历史记录 &nbsp;
+    <button type="button" class="btn btn-mini btn-icon btn-reverse" title='切换顺序'>
+      <i class="icon icon-arrow-up icon-sm"></i>
+    </button>
+    <button type="button" class="btn btn-mini btn-icon btn-expand-all" title='切换显示'>
+      <i class="icon icon-plus icon-sm"></i>
+    </button>
+     <button type='button' class='btn btn-link pull-right btn-comment' ><i class="icon icon-chat-line"></i> 添加备注</button><div class="modal fade modal-comment">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><i class="icon icon-close"></i></button>
+        <h4 class="modal-title">添加备注</h4>
+      </div>
+      <div class="modal-body">
+        <form class="load-indicator" action="/index.php?m=action&f=comment&objectType=bugmarket&objectID=11636" target='hiddenwin' method='post'>
+          <div class="form-group">
+            <textarea id='comment' name='comment' class="form-control" rows="8" autofocus="autofocus"></textarea>
+          </div>
+          <div class="form-group form-actions text-center">
+            <button type="submit" class="btn btn-primary btn-wide">保存</button>
+            <button type="button" class="btn btn-wide" data-dismiss="modal">关闭</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(function()
+{
+    $body = $('body', window.parent.document);
+    if($body.hasClass('hide-modal-close')) $body.removeClass('hide-modal-close');
+});
+</script>  </div>
+      <div class="detail-content">
+      <ol class='histories-list'>
+                        <li value='1'>
+                2025-08-19 22:08:45, 由 <strong>方仕春</strong> 创建。
+                      </li>
+                  <li value='2'>
+                2025-08-20 19:09:54, 由 <strong>付勤勤</strong> 指派给 <strong>代朝恒</strong>。
+                <button type='button' class='btn btn-mini switch-btn btn-icon btn-expand' title='切换显示'><i class='change-show icon icon-plus icon-sm'></i></button>
+        <div class='history-changes' id='changeBox3'>
+          修改了 <strong><i>指派给</i></strong>，旧值为 "fuqinqin"，新值为 "daichaoheng"。<br />
+        </div>
+                      </li>
+                  <li value='3'>
+                2025-08-20 19:47:34, 由 <strong>代朝恒</strong> 添加备注。
+                                <div class='article-content comment'>
+          <div class='comment-content'><p>该车最后一个打卡切点是上班切点，没有下班切点，导致后续的所有人脸都无效</p>
+<p><img onload="setImageSize(this,870)" src="/index.php?m=file&f=read&t=png&fileID=411376" alt="" /></p>
+<p>行业层需排查下为什么没有下班卡</p></div>
+        </div>
+                      </li>
+                  <li value='4'>
+                2025-08-20 19:48:15, 由 <strong>代朝恒</strong> 指派给 <strong>付勤勤</strong>。
+                <button type='button' class='btn btn-mini switch-btn btn-icon btn-expand' title='切换显示'><i class='change-show icon icon-plus icon-sm'></i></button>
+        <div class='history-changes' id='changeBox5'>
+          修改了 <strong><i>指派给</i></strong>，旧值为 "daichaoheng"，新值为 "fuqinqin"。<br />
+        </div>
+                      </li>
+                  <li value='5'>
+                2025-08-21 09:56:10, 由 <strong>付勤勤</strong> 指派给 <strong>江原臣</strong>。
+                <button type='button' class='btn btn-mini switch-btn btn-icon btn-expand' title='切换显示'><i class='change-show icon icon-plus icon-sm'></i></button>
+        <div class='history-changes' id='changeBox6'>
+          修改了 <strong><i>指派给</i></strong>，旧值为 "fuqinqin"，新值为 "jiangyuanchen"。<br />
+        </div>
+                      </li>
+                  <li value='6'>
+                2025-08-21 09:57:54, 由 <strong>付勤勤</strong> 添加备注。
+                                <div class='article-content comment'>
+          <div class='comment-content'><p>车辆7月份存在ibutton打卡记录</p>
+<p><img onload="setImageSize(this,870)" src="/index.php?m=file&f=read&t=png&fileID=411435" alt="" /></p>
+<p><img onload="setImageSize(this,870)" src="/index.php?m=file&f=read&t=png&fileID=411434" alt="" /></p></div>
+        </div>
+                      </li>
+                  <li value='7'>
+                2025-08-21 10:56:08, 由 <strong>江原臣</strong> 添加备注。
+                                <div class='article-content comment'>
+          <div class='comment-content'>尝试直接构造kafka历史数据，结束07-02的签到记录</div>
+        </div>
+                      </li>
+                  <li value='8'>
+                2025-08-21 13:20:45, 由 <strong>江原臣</strong> 添加备注。
+                                <div class='article-content comment'>
+          <div class='comment-content'>{"data":[{"appId":10001,"states":[{"key":"driverD","priority":30}],"tenantId":743,"time":1751396875,"type":5,"vehicle":3399612701923277381}],"st":1755753241441,"t":"FT_IBUTTON","v":"2.0"}</div>
+        </div>
+                      </li>
+                  <li value='9'>
+                2025-08-21 13:41:00, 由 <strong>江原臣</strong> 添加备注。
+                                <div class='article-content comment'>
+          <div class='comment-content'>/iotp/cloud-toolbox/cloud_kafka_client/bin/kafka-console-producer.sh --broker-list&nbsp; b-1.133044kafka380x.hznm9v.c4.kafka.sa-east-1.amazonaws.com:9092 --topic base_server_travel_point_add</div>
+        </div>
+                      </li>
+                  <li value='10'>
+                2025-08-21 13:46:44, 由 <strong>江原臣</strong> 添加备注。
+                                <div class='article-content comment'>
+          <div class='comment-content'><img onload="setImageSize(this,870)" src="/index.php?m=file&f=read&t=png&fileID=411566" alt="" /></div>
+        </div>
+                      </li>
+                  <li value='11'>
+                2025-08-22 08:51:26, 由 <strong>江原臣</strong> 确认Bug。
+                <button type='button' class='btn btn-mini switch-btn btn-icon btn-expand' title='切换显示'><i class='change-show icon icon-plus icon-sm'></i></button>
+        <div class='history-changes' id='changeBox12'>
+          修改了 <strong><i>计划修复时间</i></strong>，旧值为 "0000-00-00 00:00:00"，新值为 ""。<br />
+修改了 <strong><i>问题归属团队</i></strong>，旧值为 ""，新值为 "3"。<br />
+修改了 <strong><i>指派给         </i></strong>，旧值为 "jiangyuanchen"，新值为 "fangshichun"。<br />
+修改了 <strong><i>缺陷状态      </i></strong>，旧值为 "location"，新值为 "resolved"。<br />
+修改了 <strong><i>定位问题      </i></strong>，旧值为 ""，新值为 "yes"。<br />
+修改了 <strong><i>是否确认      </i></strong>，旧值为 "0"，新值为 "1"。<br />
+修改了 <strong><i>解决日期      </i></strong>，旧值为 ""，新值为 "2025-08-22 08:51:22"。<br />
+修改了 <strong><i>解决方案      </i></strong>，区别为：
+<blockquote class='textdiff'>001- <del></del><br />
+001+ <ins>wfx</ins></blockquote>
+<blockquote class='original'>001- <del></del><br />
+001+ <ins>wfx</ins></blockquote>        </div>
+                                <div class='article-content comment'>
+          <div class='comment-content'>07-02那天进行过ibutton签到，由于当时是旧版本，所以存在一些垃圾数据。可以通过手动发送kafka消息处理之前的垃圾数据</div>
+        </div>
+                      </li>
+                  <li value='12'>
+                2025-08-22 09:14:06, 由 <strong>方仕春</strong> 已技服验证 市场缺陷。
+                <button type='button' class='btn btn-mini switch-btn btn-icon btn-expand' title='切换显示'><i class='change-show icon icon-plus icon-sm'></i></button>
+        <div class='history-changes' id='changeBox13'>
+          修改了 <strong><i>缺陷状态</i></strong>，旧值为 "resolved"，新值为 "closed"。<br />
+修改了 <strong><i>提交页面</i></strong>，旧值为 "0"，新值为 "1"。<br />
+修改了 <strong><i>关闭日期</i></strong>，旧值为 ""，新值为 "2025-08-22 09:14:02"。<br />
+        </div>
+                      </li>
+          </ol>
+  </div>
+</div>
+</div>
+                <div class='main-actions'>
+            <div class="btn-toolbar">
+                <a href='/index.php?m=bugmarket&f=browse&productid=0&branch=0&browseType=aboutme' id='back' class='btn' title=返回[快捷键:Alt+↑]><i class="icon-goback icon-back"></i> 返回</a>
+                                    <div class='divider'></div>
+                    <div class='divider'></div>                            </div>
+        </div>
+    </div>
+    <div class="side-col col-4">
+        <div class="cell">
+            <div class='tabs'>
+                <ul class='nav nav-tabs'>
+                    <li class='active'><a href='#legendBasicInfo' data-toggle='tab'>基本信息</a></li>
+                    <!--<li><a href='#legendExecStoryTask' data-toggle='tab'></a></li>-->
+                </ul>
+                <div class='tab-content'>
+                    <div class='tab-pane active' id='legendBasicInfo'>
+                        <table class="table table-data">
+                            <tbody>
+                            <tr valign='middle'>
+                                <th class='thWidth'>缺陷状态</th>
+                                <td>已关闭</td>
+                            </tr>
+                            <tr valign='middle'>
+                                <th class='thWidth'>缺陷类型</th>
+                                <td>平台软件</td>
+                            </tr>
+
+                            <tr valign='middle'>
+                                <th class='thWidth'>缺陷归属</th>
+                                <td></td>
+                            </tr>
+
+
+                            <tr valign='middle'>
+                                <th class='thWidth'>严重程度</th>
+                                <td>一般</td>
+                            </tr>
+                            <tr valign='middle'>
+                                <th class='thWidth'>发生概率</th>
+                                <td>中</td>
+                            </tr>
+                            <tr valign='middle'>
+                                <th class='thWidth'>影响范围</th>
+                                <td>大范围（不良台数＞200）</td>
+                            </tr>
+                            <tr valign='middle'>
+                                <th class='thWidth'>问题级别</th>
+                                <td>C</td>
+                            </tr>
+                            <tr valign='middle'>
+                                <th class='thWidth'>优先级</th>
+                                <td>高</td>
+                            </tr>
+                            <!--归属团队-->
+                                                        <tr valign='middle'>
+                                <th class='thWidth'>问题归属团队</th>
+                                <td>FT</td>
+                            </tr>
+                                                        <tr valign='middle'>
+                                <th class='thWidth'>是否共性问题</th>
+                                <td>否</td>
+                            </tr>
+                                                        </tbody>
+                        </table>
+                    </div>
+                    <div class='tab-pane' id='legendExecStoryTask'>
+                        <table class='table table-data'>
+                            <tbody>
+                                                            <tr>
+                                    <th class='w-70px'>所属项目www</th>
+                                    <td></td>
+                                </tr>
+                                                        <tr>
+                                <th class='w-70px'>所属执行</th>
+                                <td></td>
+                            </tr>
+                            <tr class='nofixed'>
+                                <th>产品需求</th>
+                                <td>
+                                                                    </td>
+                            </tr>
+                            <tr>
+                                <th>相关任务</th>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cell">
+            <div class='tabs'>
+                <ul class='nav nav-tabs'>
+                    <li class='active'><a href='#legendLife' data-toggle='tab'>缺陷的一生</a></li>
+                    <!--<li><a href='#legendMisc' data-toggle='tab'></a></li>-->
+                </ul>
+                <div class='tab-content'>
+                    <div class='tab-pane active' id='legendLife'>
+                        <table class="table table-data">
+                            <tbody>
+                            <tr>
+                                <th class='thWidth'>由谁创建</th>
+                                <td> 方仕春 于 2025-08-19 22:08:45</td>
+                            </tr>
+                            <tr>
+                                <th>解决方案</th>
+                                <td>无需发版解决</td>
+                            </tr>
+                            <tr>
+                                <th>指派给</th>
+                                <td>方仕春</td>
+                            </tr>
+                                                                                                                                            <tr>
+                                <th>沟通</th>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class='tab-pane' id='legendMisc'>
+                        <table class="table table-data">
+                            <tbody>
+                            <tr class='text-top'>
+                                <th class='w-80px'></th>
+                                <td>
+                                                                    </td>
+                            </tr>
+                                                                                                                                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+            </div>
+</div>
+
+<div id="mainActions" class='main-actions'>
+    <nav class='container'></nav></div>
+<link rel='stylesheet' href='/js/kindeditor/plugins/code/prettify.css?v=15.5' type='text/css' media='screen' />
+<script src='/js/kindeditor/plugins/code/prettify.js?v=15.5'></script>
+<script>
+$(window.prettyPrint);
+</script>
+</div><script>
+$.initSidebar();
+</script>
+
+<iframe frameborder='0' name='hiddenwin' id='hiddenwin' scrolling='no' class='debugwin hidden'></iframe>
+</main><div id="noticeBox"></div>
+<script>
+/* Alert got messages. */
+needPing = false;
+$(function()
+{
+    var windowBlur = false;
+    if(window.Notification)
+    {
+        window.onblur  = function(){windowBlur = true;}
+        window.onfocus = function(){windowBlur = false;}
+    }
+    setInterval(function()
+    {
+        $.get(createLink('message', 'ajaxGetMessage', "windowBlur=" + (windowBlur ? '1' : '0')), function(data)
+        {
+            if(!windowBlur)
+            {
+                $('#noticeBox').append(data);
+                adjustNoticePosition();
+            }
+            else
+            {
+                if(data)
+                {
+                    if(typeof data == 'string') data = $.parseJSON(data);
+                    if(typeof data.message == 'string') notifyMessage(data);
+                }
+            }
+        });
+    }, 300000);
+})
+
+</script>
+
+<script>$(function()
+{
+    var page = window.page || '';
+    var flow = window.flow;
+    if(typeof(systemMode) == undefined) var systemMode = '';
+
+    $('#subNavbar a[data-toggle=dropdown]').parent().addClass('dropdown dropdown-hover');
+
+    if(page == 'create' || page == 'edit' || page == 'assignedto' || page == 'confirmbug')
+    {
+        oldProductID = $('#product').val();
+    }
+
+    if(window.flow != 'full')
+    {
+        $('.querybox-toggle').click(function()
+        {
+            $(this).parent().toggleClass('active');
+        });
+    }
+    changLevel();
+    changSoft();
+});
+function changLevel(){
+    var severity = $("#severity").val();
+    var influenceCount = $("#influenceCount").val();
+    $("#level").val(0);
+    $("#level1").val('');
+    //S
+    if(3 == severity && 1==influenceCount){
+        $("#level").val('1')
+        $("#level1").val('1')
+    }
+    //A
+    if((3 == severity && 2==influenceCount) || (2 == severity && 1==influenceCount)){
+        $("#level").val('2')
+        $("#level1").val('2')
+    }
+    //B
+    if((2 == severity && 2==influenceCount) || (3 == severity && 3==influenceCount)){
+        $("#level").val('3')
+        $("#level1").val('3')
+    }
+    //C
+    if((1 == severity) || (3 != severity && 3==influenceCount)){
+        $("#level").val('4')
+        $("#level1").val('4')
+    }
+}
+function changSoft(){
+    var bugType = $("#bugType").val();//S
+    var attributionID;
+    if(1 == bugType || 2==bugType){
+        $(".device").show();
+        $(".soft").hide();
+
+    }else{
+        $(".soft").show();
+        $(".device").hide();
+    }
+    var istrue = false;
+    if (bugType == 3){
+        attributionID = 'device';
+        istrue = true;
+        $(".Team").show();
+    }else if(4 == bugType){
+        attributionID = 'web';
+        istrue = true;
+        $(".Team").show();
+    }else{
+        $(".Team").hide();
+    }
+    if (istrue){
+        if(typeof(attributionID) == 'undefined') attributionID = '';
+        if(typeof(attribution2ID) == 'undefined') attribution2ID = '';
+        if($('#attributionTeamBox')){
+            getAttributionTeamlink = createLink('bugmarket', 'ajaxGetAttributionTeams', 'attributionID=' + attributionID+'&attribution2ID=' + attribution2ID);
+            $('#attributionTeamBox').load(getAttributionTeamlink, function(){
+                $('#attributionTeam').chosen();
+            });
+        }
+    }
+}
+function changiscommon(){
+    $(".qualityer").hide();
+    var iscommon = $("#iscommon").val();
+    if (1 == iscommon){
+        $(".qualityer").show();
+    }else{
+        $("#qualityer").val('');
+        $("#qualityaffect").val('');
+    }
+}
+function changType(){
+    var solution = $("#solution").val();
+    ///console.log(solution);
+    var type = 'yes';
+
+    $(".type1").hide();
+    $(".type2").hide();
+    $(".type3").hide();
+    $(".type4").hide();
+    $(".type5").hide();
+    $(".type6").hide();
+    $("#assignedTotext").html('');
+    //1
+    if ('go'==solution && 'yes'==type){
+        $(".type1").show();
+        $("#assignedTotext").html('确认修复计划');
+        $('#status').val('version');
+    }
+    //2
+    if ('go'==solution && 'no'==type){
+        $(".type2").show();
+        $('#status').val('location');
+    }
+    //3 新需求
+    if ('new'==solution){
+        $("#assignedTotext").html('进行产品验证');
+        $('#status').val('pdyj');
+    }
+    //4 评审不解决
+    if ('psbjj'==solution || 'no'==solution || 'wfx'==solution){
+        $("#assignedTotext").html('进行技服确认');
+        $('#status').val('resolved');
+    }
+    //5 重复问题未解决
+    if ('wei'==solution){
+        $(".type5").show();
+        $("#assignedTotext").html('进行技服确认');
+        $('#status').val('resolved');
+    }
+    //6 重复问题已解决
+    if ('yi'==solution){
+        $(".type6").show();
+        $("#assignedTotext").html('进行技服确认');
+        $('#status').val('resolved');
+    }
+
+    //指派人设置
+    if ('new'==solution || isoutline){
+        $("#assignedTot").html($("#assignedTo2").html())
+        $("#assignedTot").find('select:first')
+            .trigger('liszt:updated')
+            .picker({type: 'user'});
+    }else{
+        $("#assignedTot").html($("#assignedTo1").html())
+    }/*else if('go'==solution || 'psbjj'==solution || 'no'==solution || 'wfx'==solution){
+        $("#assignedTo1").show();
+    }*/
+
+}
+
+/**
+ * Load all fields.
+ *
+ * @param  int $productID
+ * @access public
+ * @return void
+ */
+function loadAll(productID)
+{
+    if(page == 'create')
+    {
+        loadExecutionTeamMembers(productID);
+        setAssignedTo();
+    }
+
+    if(typeof(changeProductConfirmed) != 'undefined' && !changeProductConfirmed)
+    {
+        firstChoice = confirm(confirmChangeProduct);
+        changeProductConfirmed = true;    // Only notice the user one time.
+
+        if(!firstChoice)
+        {
+            $('#product').val(oldProductID);//Revert old product id if confirm is no.
+            $('#product').trigger("chosen:updated");
+            $('#product').chosen();
+            return true;
+        }
+
+        loadAll(productID);
+    }
+    else
+    {
+        $('#taskIdBox').innerHTML = '<select id="task"></select>';  // Reset the task.
+        $('#task').chosen();
+        loadProductBranches(productID)
+        loadProductModules(productID);
+        loadProductProjects(productID);
+        loadProductBuilds(productID);
+        loadProductplans(productID);
+        loadProductStories(productID);
+        //loadTestTasks(productID);
+    }
+}
+
+/**
+ * Load by branch.
+ *
+ * @access public
+ * @return void
+ */
+function loadBranch()
+{
+    $('#taskIdBox').innerHTML = '<select id="task"></select>';  // Reset the task.
+    $('#task').chosen();
+    productID = $('#product').val();
+    loadProductModules(productID);
+    loadProductProjects(productID);
+    loadProductBuilds(productID);
+    loadProductplans(productID);
+    loadProductStories(productID);
+}
+
+/**
+  *Load all builds of one execution or product.
+  *
+  * @param  object $object
+  * @access public
+  * @return void
+  */
+function loadAllBuilds(object)
+{
+    if(page == 'resolve')
+    {
+        oldResolvedBuild = $('#resolvedBuild').val() ? $('#resolvedBuild').val() : 0;
+        link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=resolvedBuild&build=' + oldResolvedBuild + '&branch=0&index=0&type=all');
+        $('#resolvedBuildBox').load(link, function(){$(this).find('select').chosen()});
+    }
+    else
+    {
+        productID   = $('#product').val();
+        executionID = $('#execution').val();
+
+        var buildBox = '';
+        if(page == 'edit') buildBox = $(object).closest('.input-group').attr('id');
+
+        if(executionID)
+        {
+            loadAllExecutionBuilds(executionID, productID, buildBox);
+        }
+        else
+        {
+            loadAllProductBuilds(productID, buildBox);
+        }
+    }
+}
+
+/**
+  * Load all builds of the execution.
+  *
+  * @param  int    $executionID
+  * @param  int    $productID
+  * @param  string $buildBox
+  * @access public
+  * @return void
+  */
+function loadAllExecutionBuilds(executionID, productID, buildBox)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(page == 'create')
+    {
+        oldOpenedBuild = $('#openedBuild').val() ? $('#openedBuild').val() : 0;
+        link = createLink('build', 'ajaxGetExecutionBuilds', 'executionID=' + executionID + '&productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch + '&index=0&needCreate=true&type=all');
+        $.get(link, function(data)
+        {
+            if(!data) data = '<select id="openedBuild" name="openedBuild" class="form-control" multiple=multiple></select>';
+            $('#openedBuild').replaceWith(data);
+            $('#openedBuild_chosen').remove();
+            $('#openedBuild').next('.picker').remove();
+            $("#openedBuild").chosen();
+            notice();
+        })
+    }
+    if(page == 'edit')
+    {
+        if(buildBox == 'openedBuildBox')
+        {
+            link = createLink('build', 'ajaxGetExecutionBuilds', 'executionID=' + executionID + '&productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch + '&index=0&needCreate=true&type=all');
+            $('#openedBuildBox').load(link, function(){$(this).find('select').chosen()});
+        }
+        if(buildBox == 'resolvedBuildBox')
+        {
+            link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=resolvedBuild&build=' + oldResolvedBuild + '&branch=' + branch + '&index=0&type=all');
+            $('#resolvedBuildBox').load(link, function(){$(this).find('select').chosen()});
+        }
+    }
+}
+
+/**
+  * Load all builds of the product.
+  *
+  * @param  int    $productID
+  * @param  string $buildBox
+  * @access public
+  * @return void
+  */
+function loadAllProductBuilds(productID, buildBox)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(page == 'create')
+    {
+        link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch + '&index=0&type=all');
+        $.get(link, function(data)
+        {
+            if(!data) data = '<select id="openedBuild" name="openedBuild" class="form-control" multiple=multiple></select>';
+            $('#openedBuild').replaceWith(data);
+            $('#openedBuild_chosen').remove();
+            $('#openedBuild').next('.picker').remove();
+            $("#openedBuild").chosen();
+            notice();
+        })
+    }
+    if(page == 'edit')
+    {
+        if(buildBox == 'openedBuildBox')
+        {
+            link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch + '&index=0&type=all');
+            $('#openedBuildBox').load(link, function(){$(this).find('select').chosen()});
+        }
+        if(buildBox == 'resolvedBuildBox')
+        {
+            link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=resolvedBuild&build=' + oldResolvedBuild + '&branch' + branch + '&index=0&type=all');
+            $('#resolvedBuildBox').load(link, function(){$(this).find('select').chosen()});
+        }
+    }
+}
+
+/**
+ * Load product's modules.
+ *
+ * @param  int    $productID
+ * @access public
+ * @return void
+ */
+function loadProductModules(productID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(typeof(moduleID) == 'undefined') moduleID = 0;
+    link = createLink('tree', 'ajaxGetOptionMenu', 'productID=' + productID + '&viewtype=bug&branch=' + branch + '&rootModuleID=0&returnType=html&fieldID=&needManage=true&extra=&currentModuleID=' + moduleID);
+    $('#moduleIdBox').load(link, function()
+    {
+        $(this).find('select').chosen()
+        if(typeof(bugModule) == 'string') $('#moduleIdBox').prepend("<span class='input-group-addon' style='border-left-width: 1px;'>" + bugModule + "</span>");
+    });
+}
+
+/**
+ * Load product stories
+ *
+ * @param  int    $productID
+ * @access public
+ * @return void
+ */
+function loadProductStories(productID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(typeof(oldStoryID) == 'undefined') oldStoryID = 0;
+    link = createLink('story', 'ajaxGetProductStories', 'productID=' + productID + '&branch=' + branch + '&moduleId=0&storyID=' + oldStoryID);
+    $('#storyIdBox').load(link, function(){$('#story').chosen();});
+}
+
+/**
+ * Load projects of product.
+ *
+ * @param  int    $productID
+ * @access public
+ * @return void
+ */
+function loadProductProjects(productID)
+{
+    if(systemMode == 'classic')
+    {
+        var projectID = $('#execution').find("option:selected").val();
+        loadProductExecutions(productID, projectID);
+        return true;
+    }
+
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+
+    link = createLink('product', 'ajaxGetProjects', 'productID=' + productID + '&branch=' + branch + '&projectID=' + oldProjectID);
+    $('#projectBox').load(link, function()
+    {
+        $(this).find('select').chosen();
+        var projectID = $('#project').find("option:selected").val();
+        loadProductExecutions(productID, projectID);
+    });
+}
+
+/**
+ * Load executions of product.
+ *
+ * @param  int    $productID
+ * @param  int    $projectID
+ * @access public
+ * @return void
+ */
+function loadProductExecutions(productID, projectID = 0)
+{
+    required = $('#execution_chosen').hasClass('required');
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+
+    link = createLink('product', 'ajaxGetExecutions', 'productID=' + productID + '&projectID=' + projectID + '&branch=' + branch);
+    $('#executionIdBox').load(link, function()
+    {
+        $(this).find('select').chosen();
+        if(typeof(bugExecution) == 'string' && systemMode != 'classic') $('#executionIdBox').prepend("<span class='input-group-addon' style='border-left-width: 0px;'>" + bugExecution + "</span>");
+        if(required) $(this).addClass('required');
+    });
+}
+
+/**
+ * Load product plans.
+ *
+ * @param  productID $productID
+ * @access public
+ * @return void
+ */
+function loadProductplans(productID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    link = createLink('productplan', 'ajaxGetProductplans', 'productID=' + productID + '&branch=' + branch);
+    $('#planIdBox').load(link, function(){$(this).find('select').chosen()});
+}
+
+/**
+ * Load product builds.
+ *
+ * @param  productID $productID
+ * @access public
+ * @return void
+ */
+function loadProductBuilds(productID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(typeof(oldOpenedBuild) == 'undefined') oldOpenedBuild = 0;
+    link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch);
+
+    if(page == 'create')
+    {
+        $.get(link, function(data)
+        {
+            if(!data) data = '<select id="openedBuild" name="openedBuild" class="form-control" multiple=multiple></select>';
+            $('#openedBuild').replaceWith(data);
+            $('#openedBuild_chosen').remove();
+            $('#openedBuild').next('.picker').remove();
+            $("#openedBuild").chosen();
+            notice();
+        })
+    }
+    else
+    {
+        $('#openedBuildBox').load(link, function(){$(this).find('select').chosen()});
+        link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=resolvedBuild&build=' + oldResolvedBuild + '&branch=' + branch);
+        $('#resolvedBuildBox').load(link, function(){$(this).find('select').chosen()});
+    }
+}
+
+/**
+ * Load execution related bugs and tasks.
+ *
+ * @param  int    $executionID
+ * @access public
+ * @return void
+ */
+function loadExecutionRelated(executionID)
+{
+    executionID = parseInt(executionID);
+    if(executionID)
+    {
+        loadExecutionTasks(executionID);
+        loadExecutionStories(executionID);
+        loadExecutionBuilds(executionID);
+        loadAssignedTo(executionID);
+        loadTestTasks($('#product').val(), executionID);
+    }
+    else
+    {
+        $('#taskIdBox').innerHTML = '<select id="task"></select>';  // Reset the task.
+        loadProductStories($('#product').val());
+        loadProductBuilds($('#product').val());
+        loadTestTasks($('#product').val());
+        loadProjectTeamMembers($('#project').val());
+    }
+}
+
+/**
+ * Load execution tasks.
+ *
+ * @param  executionID $executionID
+ * @access public
+ * @return void
+ */
+function loadExecutionTasks(executionID)
+{
+    link = createLink('task', 'ajaxGetExecutionTasks', 'executionID=' + executionID + '&taskID=' + oldTaskID);
+    $.post(link, function(data)
+    {
+        if(!data) data = '<select id="task" name="task" class="form-control"></select>';
+        $('#task').replaceWith(data);
+        $('#task_chosen').remove();
+        $('#task').next('.picker').remove();
+        $("#task").chosen();
+    })
+}
+
+/**
+ * Load execution stories.
+ *
+ * @param  executionID $executionID
+ * @access public
+ * @return void
+ */
+function loadExecutionStories(executionID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(typeof(oldStoryID) == 'undefined') oldStoryID = 0;
+    link = createLink('story', 'ajaxGetExecutionStories', 'executionID=' + executionID + '&productID=' + $('#product').val() + '&branch=' + branch + '&moduleID=0&storyID=' + oldStoryID);
+    $('#storyIdBox').load(link, function(){$('#story').chosen();});
+}
+
+/**
+ * Load builds of a execution.
+ *
+ * @param  int      $executionID
+ * @access public
+ * @return void
+ */
+function loadExecutionBuilds(executionID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    productID = $('#product').val();
+    oldOpenedBuild = $('#openedBuild').val() ? $('#openedBuild').val() : 0;
+
+    if(page == 'create')
+    {
+        link = createLink('build', 'ajaxGetExecutionBuilds', 'executionID=' + executionID + '&productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + "&branch=" + branch + "&index=0&needCreate=true");
+        $.get(link, function(data)
+        {
+            if(!data) data = '<select id="openedBuild" name="openedBuild" class="form-control" multiple=multiple></select>';
+            $('#openedBuild').replaceWith(data);
+            $('#openedBuild').val(oldOpenedBuild);
+            $('#openedBuild_chosen').remove();
+            $('#openedBuild').next('.picker').remove();
+            $("#openedBuild").chosen();
+            notice();
+        })
+    }
+    else
+    {
+        link = createLink('build', 'ajaxGetExecutionBuilds', 'executionID=' + executionID + '&productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch);
+        $('#openedBuildBox').load(link, function(){$(this).find('select').val(oldOpenedBuild).chosen()});
+
+        oldResolvedBuild = $('#resolvedBuild').val() ? $('#resolvedBuild').val() : 0;
+        link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=resolvedBuild&build=' + oldResolvedBuild + '&branch=' + branch);
+        $('#resolvedBuildBox').load(link, function(){$(this).find('select').val(oldResolvedBuild).chosen()});
+    }
+}
+
+/**
+ * Load project members.
+ *
+ * @param  projectID $projectID
+ * @access public
+ * @return void
+ */
+function loadProjectTeamMembers(projectID)
+{
+    link = createLink('bug', 'ajaxGetProjectTeamMembers', 'projectID=' + projectID);
+    $.get(link, function(data)
+    {
+        if(!data) data = '<select id="assignedTo" name="assignedTo" class="form-control"></select>';
+        $('#assignedTo').replaceWith(data);
+        $('#assignedTo_chosen').remove();
+        $("#assignedTo").chosen();
+    });
+}
+
+/**
+ * Set story field.
+ *
+ * @param  moduleID $moduleID
+ * @param  productID $productID
+ * @param  storyID $storyID
+ * @access public
+ * @return void
+ */
+function setStories(moduleID, productID, storyID)
+{
+    var branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    link = createLink('story', 'ajaxGetProductStories', 'productID=' + productID + '&branch=' + branch + '&moduleID=' + moduleID + '&storyID=' + storyID);
+    $.get(link, function(stories)
+    {
+        if(!stories) stories = '<select id="story" name="story" class="form-control"></select>';
+        $('#story').replaceWith(stories);
+        $('#story_chosen').remove();
+        $('#story').next('.picker').remove();
+        $("#story").chosen();
+    });
+}
+
+/**
+ * Load product branches.
+ *
+ * @param  int $productID
+ * @access public
+ * @return void
+ */
+function loadProductBranches(productID)
+{
+    $('#branch').remove();
+    $('#branch_chosen').remove();
+    $('#branch').next('.picker').remove();
+    $.get(createLink('branch', 'ajaxGetBranches', "productID=" + productID), function(data)
+    {
+        if(data)
+        {
+            $('#product').closest('.input-group').append(data);
+            $('#branch').css('width', page == 'create' ? '120px' : '65px');
+            $('#branch').chosen();
+        }
+    })
+}
+
+
+var oldAssignedToTitle = $("#assignedTo").find("option:selected").text();
+var oldAssignedTo      = $("#assignedTo").find("option:selected").val();
+
+/**
+ * Load team members of the execution as assignedTo list.
+ *
+ * @param  int     $executionID
+ * @access public
+ * @return void
+ */
+function loadAssignedTo(executionID, selectedUser)
+{
+    selectedUser = (typeof(selectedUser) == 'undefined') ? '' : $('#assignedTo').val();
+    link = createLink('bug', 'ajaxLoadAssignedTo', 'executionID=' + executionID + '&selectedUser=' + selectedUser);
+    $.get(link, function(data)
+    {
+        var defaultOption = '<option title="' + oldAssignedToTitle + '" value="' + oldAssignedTo + '" selected="selected">' + oldAssignedToTitle + '</option>';
+        var defaultAssignedTo = $('#assignedTo').val();
+
+        $('#assignedTo_chosen').remove();
+        $('#assignedTo').next('.picker').remove();
+        $('#assignedTo').replaceWith(data);
+
+        if(defaultAssignedTo !== oldAssignedTo && selectedUser == '')
+        {
+            if($('#assignedTo option[value="' + oldAssignedTo + '"]').length > 0) $('#assignedTo option[value="' + oldAssignedTo + '"]').remove();
+            $('#assignedTo').append(defaultOption);
+        }
+        $('#assignedTo').chosen();
+    });
+}
+
+var oldTestTaskTitle = $("#testtask").find("option:selected").text();
+var oldTestTask      = $("#testtask").find("option:selected").val();
+
+/**
+ * Load test tasks.
+ *
+ * @param  int $productID
+ * @param  int $executionID
+ * @access public
+ * @return void
+ */
+function loadTestTasks(productID, executionID)
+{
+    if(typeof(executionID) == 'undefined') executionID = 0;
+    link = createLink('testtask', 'ajaxGetTestTasks', 'productID=' + productID + '&executionID=' + executionID);
+    $.get(link, function(data)
+    {
+        var defaultOption = '<option title="' + oldTestTaskTitle + '" value="' + oldTestTask + '" selected="selected">' + oldTestTaskTitle + '</option>';
+        $('#testtaskBox').html(data);
+        $('#testtask').append(defaultOption);
+        $('#testtask').chosen();
+    });
+}
+
+/**
+ * notice for create build.
+ *
+ * @access public
+ * @return void
+ */
+function notice()
+{
+    $('#buildBoxActions').empty().hide();
+    if($('#openedBuild').find('option').length <= 1)
+    {
+        var html = '';
+        if($('#execution').length == 0 || $('#execution').val() == 0)
+        {
+            var branch = $('#branch').val();
+            if(typeof(branch) == 'undefined') branch = 0;
+            var link = createLink('release', 'create', 'productID=' + $('#product').val() + '&branch=' + branch);
+            if(config.onlybody != 'yes') link += config.requestType == 'GET' ? '&onlybody=yes' : '?onlybody=yes';
+            html += '<a href="' + link + '" data-toggle="modal" data-type="iframe" style="padding-right:5px">' + createBuild + '</a> ';
+            html += '<a href="javascript:loadProductBuilds(' + $('#product').val() + ')">' + refresh + '</a>';
+        }
+        else
+        {
+            executionID = $('#execution').val();
+            productID   = $('#product').val();
+            projectID   = $('#project').val();
+            link = createLink('build', 'create','executionID=' + executionID + '&productID=' + productID + '&projectID=' + projectID);
+            link += config.requestType == 'GET' ? '&onlybody=yes' : '?onlybody=yes';
+            html += '<a href="' + link + '" data-toggle="modal" data-type="iframe" style="padding-right:5px">' + createBuild + '</a> ';
+            html += '<a href="javascript:loadExecutionBuilds(' + executionID + ')">' + refresh + '</a>';
+        }
+        var $bba = $('#buildBoxActions');
+        if($bba.length)
+        {
+            $bba.html(html);
+            $bba.show();
+        }
+        else
+        {
+            if($('#buildBox').closest('tr').find('td').size() > 1)
+            {
+                $('#buildBox').closest('td').next().attr('id', 'buildBoxActions');
+                $('#buildBox').closest('td').next().html(html);
+            }
+            else
+            {
+                html = "<td id='buildBoxActions'>" + html + '</td>';
+                $('#buildBox').closest('td').after(html);
+            }
+        }
+    }
+}
+/**
+ * wandonghao
+ * @param attributionID
+ */
+function loadGetBuildbutions(product,productVersion,status=12){
+    if(typeof(product) == 'undefined') product = '';
+    if(typeof(productVersion) == 'undefined') productVersion = '';
+    link = createLink('bugmarket', 'ajaxGetBuildbutions', 'product=' + product+'&productVersion=' + productVersion+'&status=' + status);
+    $('#productVersionBox').load(link, function(){
+        $('#productVersion').chosen();
+    });
+}
+
+</script>
+<link rel='stylesheet' href='/theme/default/floating-window.css?v=15.5' type='text/css' media='screen' />
+<script src='/js/misc/floatingWindow.js?v=15.5'></script>
+</body>
+</html>
+<style>
+    #legendBasicInfo .thWidth {
+        width: 90px !important;
+    }
+    .popover {
+        left: 606.88px !important;
+        max-width: 1600px;
+    }
+</style>
+<script>
+    $(function () {
+        $('.linkBtn').on('click',function (){
+            $('.image-box').slideDown("slow")
+
+        })
+
+        $('.close-icon').click(function(){
+            $('.image-box').slideUp("slow")
+        })
+    })
+    $('[data-toggle="popover"]').popover({
+        placement: 'bottom'
+    });
+</script>

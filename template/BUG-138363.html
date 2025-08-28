@@ -5,17 +5,17 @@
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="renderer" content="webkit">
-  <title>导用例产品-开发使用-Bug - 锐明RDMS</title>
-<script>window.config={"webRoot":"\/","debug":true,"appName":"","cookieLife":30,"requestType":"GET","requestFix":"-","moduleVar":"m","methodVar":"f","viewVar":"t","defaultView":"html","themeRoot":"\/theme\/","currentModule":"bug","currentMethod":"browse","clientLang":"zh-cn","requiredFields":"","router":"\/index.php","save":"\u4fdd\u5b58","runMode":"","timeout":0,"pingInterval":""};
+  <title>BUG #138363 【SIT-V3.17.4-P11】【Shipper】【报警中心-报警列表】FTCloud打标后shipper报警详情标题不展示标签 - FT-V3.X - 锐明RDMS</title>
+<script>window.config={"webRoot":"\/","debug":true,"appName":"","cookieLife":30,"requestType":"GET","requestFix":"-","moduleVar":"m","methodVar":"f","viewVar":"t","defaultView":"html","themeRoot":"\/theme\/","currentModule":"bug","currentMethod":"view","clientLang":"zh-cn","requiredFields":"","router":"\/index.php","save":"\u4fdd\u5b58","runMode":"","timeout":0,"pingInterval":""};
 window.lang={"submitting":"\u7a0d\u5019...","save":"\u4fdd\u5b58","expand":"\u5c55\u5f00\u5168\u90e8","timeout":"\u8fde\u63a5\u8d85\u65f6\uff0c\u8bf7\u68c0\u67e5\u7f51\u7edc\u73af\u5883\uff0c\u6216\u91cd\u8bd5\uff01"};
 
 </script>
-<script>config.onlybody = "no";</script><link rel='stylesheet' href='/theme/zui/css/min.css?t=1756300284?v=15.5' type='text/css' media='screen' />
-<link rel='stylesheet' href='/theme/default/style.css?t=1756300284?v=15.5' type='text/css' media='screen' />
+<script>config.onlybody = "no";</script><link rel='stylesheet' href='/theme/zui/css/min.css?t=1756351508?v=15.5' type='text/css' media='screen' />
+<link rel='stylesheet' href='/theme/default/style.css?t=1756351508?v=15.5' type='text/css' media='screen' />
 <link rel='stylesheet' href='/theme/lang/zh-cn.css?v=15.5' type='text/css' media='screen' />
 <script src='/js/jquery/lib.js?v=15.5'></script>
-<script src='/js/zui/min.js?t=1756300284&v=15.5'></script>
-<script src='/js/my.full.js?t=1756300284&v=15.5'></script>
+<script src='/js/zui/min.js?t=1756351508&v=15.5'></script>
+<script src='/js/my.full.js?t=1756351508&v=15.5'></script>
 <style>.ke-toolbar .ke-outline[data-name='savetemplate'] {display: none;}
 #modulemenu .nav #dropMenu #searchResult .closed {text-decoration: none;}
 .nav #moreMenus {cursor: pointer;}
@@ -25,39 +25,13 @@ window.lang={"submitting":"\u7a0d\u5019...","save":"\u4fdd\u5b58","expand":"\u5c
 #batchCreateForm .input-group .colorpicker, #batchEditForm .input-group .colorpicker {z-index: 2;}
 #batchCreateForm .input-group .colorpicker.open, #batchEditForm .input-group .colorpicker.open {z-index: 5;}
 .warning2{color: #ff5d5d;font-weight: normal}
-.closed, .closed a {color: gray; text-decoration:line-through;}
-.resolved, .resolved a {color: #8EC21F; text-decoration: none;}
-.tree .closed, .tree .closed a {color: #003366; text-decoration: none;}
-.confirm0 {color: gray;}
-.confirm1 {color: green;}
-td.delayed {color: #fff; background: #e84e0f !important;}
-
-.datatable-wrapper .table-datatable .datatable-row td {height: 37px;}
-
-#createActionMenu .dropdown-menu {width: 100%;}
-
-.dropdown-menu.with-search {padding: 0; min-width: 150px; overflow: hidden; max-height: 302px;}
-.dropdown-menu > .menu-search .input-group {width: 100%;}
-.dropdown-menu > .menu-search .input-group-addon {position: absolute; right: 10px; top: 0; z-index: 10; background: none; border: none; color: #666;}
-.dropdown-menu > .menu-search .form-control {border: none !important; box-shadow: none !important; border-top: 1px solid #ddd !important;}
-.dropdown-menu > li > a {text-align: left;}
-.dropdown-list {display: block; padding: 0; max-height: 270px; overflow-y: auto;}
-.dropdown-list > li > a {display: block; padding: 3px 20px; clear: both; font-weight: normal; line-height: 1.53846154; color: #141414; white-space: nowrap;}
-.dropdown-list > li > a:hover,
-.dropdown-list > li > a:focus {color: #1a4f85; text-decoration: none; background-color: #ddd;}
-
-th.c-confirmed {text-align: center;}
-.c-severity {overflow: hidden; white-space: nowrap;}
-.c-id {text-overflow: ellipsis; white-space: nowrap;}
-
-.body-modal #mainMenu>.btn-toolbar {width: auto;}
-
-body {margin-bottom: 25px;}
-#mainMenu .btn-toolbar .btn-group .dropdown-menu .btn-active-text:hover .text {color: #fff;}
-#mainMenu .btn-toolbar .btn-group .dropdown-menu .btn-active-text:hover .text:after {border-bottom: unset;}
-.btn-group a i.icon-plus {font-size: 16px;}
-.btn-group a.btn-primary {border-right: 1px solid rgba(255,255,255,0.3);}
-.btn-group button.dropdown-toggle.btn-primary {padding:6px;}
+.content .stepTitle {display: block; color: green; margin: 0px;}
+.table-fixed td {white-space: unset;}
+.table-data tr > td {word-break: break-all; word-wrap: break-word;}
+.side-col .cell {padding: 0px;}
+.tab-pane table {border: 1px solid #ddd; border-top: none;}
+#legendBasicInfo .thWidth {width: 70px !important;}
+#legendLife .thWidth {width: 90px !important;}
 </style><link rel='icon' href='/favicon.ico' type='image/x-icon' />
 <link rel='shortcut icon' href='/favicon.ico' type='image/x-icon' />
 <!--[if lt IE 10]>
@@ -90,23 +64,9 @@ if($.fn.picker)
   <div id='mainHeader'>
     <div class='container'>
       <div id='heading'>
-        <div class='btn-group header-btn'><a href='/index.php?m=bug&f=browse' class='btn' style='padding-top: 2px'><i class='icon icon-test'></i> 测试</a>
-</div>        <div class='btn-group header-btn' id='swapper'><button data-toggle='dropdown' type='button' class='btn' id='currentItem' title='导用例产品-开发使用'><span class='text'>导用例产品-开发使用</span> <span class='caret' style='margin-bottom: -1px'></span></button><div id='dropMenu' class='dropdown-menu search-list' data-ride='searchList' data-url='/index.php?m=product&f=ajaxGetDropMenu&objectID=831&module=bug&method=browse&extra=&from=qa'><div class="input-control search-box has-icon-left has-icon-right search-example"><input type="search" class="form-control search-input" /><label class="input-control-icon-left search-icon"><i class="icon icon-search"></i></label><a class="input-control-icon-right search-clear-btn"><i class="icon icon-close icon-sm"></i></a></div></div></div>      </div>
+        <div class='btn-group header-btn'><a href='/index.php?m=bugmarket&f=browse' class='btn' style='padding-top: 2px'><i class='icon icon-cube'></i> 市场缺陷</a>
+</div>              </div>
       <nav id='navbar'><ul class='nav nav-default'>
-<li class=' ' data-id='index'><a href='/index.php?m=qa&f=index' >仪表盘</a>
-</li>
-<li class='divider'></li><li class=' active' data-id='bug'><a href='/index.php?m=bug&f=browse&productID=831' >Bug</a>
-</li>
-<li class=' ' data-id='testcase'><a href='/index.php?m=testcase&f=browse&productID=831' >用例</a>
-</li>
-<li class=' ' data-id='testsuite'><a href='/index.php?m=testsuite&f=browse&productID=831' >套件</a>
-</li>
-<li class='divider'></li><li class=' ' data-id='testtask'><a href='/index.php?m=testtask&f=browse&productID=831' >测试单</a>
-</li>
-<li class=' ' data-id='report'><a href='/index.php?m=testreport&f=browse&productID=831' >测试报告</a>
-</li>
-<li class='divider'></li><li class=' ' data-id='caselib'><a href='/index.php?m=caselib&f=browse&libID=0' >用例库</a>
-</li>
 </ul>
 </nav>
       <div id='toolbar'>
@@ -123,10 +83,10 @@ if($.fn.picker)
 </li><li><a href='https://api.zentao.net/goto.php?item=aiux' class='link-aiux' target='_blank'><i class='icon icon-aiux'></i> 艾体验设计</a></li><li class="divider"></li><li><a href='/index.php?m=user&f=logout'  target='_top'><i class='icon icon-exit'></i> 退出</a>
 </li></ul></li>
             <li class='dropdown dropdown-hover' id='globalCreate'><a class='dropdown-toggle' data-toggle='dropdown'><i class='icon icon-plus-solid-circle text-secondary'></i></a><ul class='dropdown-menu pull-right create-list'><li><a href='/index.php?m=todo&f=create' ><i class='icon icon-todo'></i> 待办</a>
-</li><li class="divider"></li><li><a href='/index.php?m=bug&f=create&productID=831&branch=&extras=from=global' ><i class='icon icon-bug'></i> Bug</a>
-</li><li><a href='/index.php?m=story&f=create&productID=831&branch=0&moduleID=0&storyID=0&objectID=0&bugID=0&planID=0&todoID=0&extra=from=global' ><i class='icon icon-lightbulb'></i> 需求</a>
+</li><li class="divider"></li><li><a href='/index.php?m=bug&f=create&productID=43&branch=&extras=from=global' ><i class='icon icon-bug'></i> Bug</a>
+</li><li><a href='/index.php?m=story&f=create&productID=43&branch=0&moduleID=0&storyID=0&objectID=0&bugID=0&planID=0&todoID=0&extra=from=global' ><i class='icon icon-lightbulb'></i> 需求</a>
 </li><li><a href='/index.php?m=task&f=create&executionID=0&storyID=0&moduleID=0&taskID=0&todoID=0&extra=from=global' ><i class='icon icon-check-sign'></i> 任务</a>
-</li><li><a href='/index.php?m=testcase&f=create&productID=831&branch=&moduleID=0&from=&param=0&storyID=0&extras=from=global' ><i class='icon icon-sitemap'></i> 用例</a>
+</li><li><a href='/index.php?m=testcase&f=create&productID=43&branch=&moduleID=0&from=&param=0&storyID=0&extras=from=global' ><i class='icon icon-sitemap'></i> 用例</a>
 </li><li><a href='/index.php?m=doc&f=selectLibType&objectType=&objectID=0&libID=0&onlybody=yes' class='iframe' data-width='650px'><i class='icon icon-doc'></i> 文档</a>
 </li><li class="divider"></li><li><a href='/index.php?m=execution&f=create&projectID=&executionID=0&copyExecutionID=0&planID=0&confirm=no&productID=0&extra=from=global' ><i class='icon icon-run'></i> 执行</a>
 </li><li><a href='/index.php?m=project&f=create&model=scrum&programID=0&copyProjectID=0&extra=from=global' ><i class='icon icon-project'></i> 项目</a>
@@ -143,178 +103,499 @@ adjustMenuWidth();
 </script>
 <main id='main'  >
   <div class='container'>
-<style>
-#setShowModule {margin-left: 30px;}
-</style>
+<script src='/js/kindeditor/kindeditor.min.js?v=15.5'></script>
+<script src='/js/kindeditor/lang/zh_CN.js?v=15.5'></script>
 <script>
-$(function()
-{
-        $('#sidebar .cell .text-center:last').append("<a href='#showModuleModal' data-toggle='modal' class='btn btn-info btn-wide'>模块设置</a><hr class='space-sm' />");
-    
-    var addSettingButton = function()
-    {
-        var $btnToolbar = $('#main .table-header .btn-toolbar:first');
-        if($btnToolbar.length > 0)
-        {
-                        var $dropdown = $('<div class="dropdown"><button id="tableCustomBtn" type="button" class="btn btn-link" data-toggle="dropdown"><i class="icon-cog-outline"></i></button></div>');
-            var $dropmenu = $('<ul class="dropdown-menu pull-right"></ul>');
-            if(typeof(storyType) != 'undefined' && storyType == 'requirement')
-            {
-                $dropmenu.append("<li><a href='/index.php?m=datatable&f=ajaxCustom&id=bug&method=browse&extra=requirement' data-toggle='modal' data-type='ajax'>自定义列</a></li>");
-            }
-            else
-            {
-                $dropmenu.append("<li><a href='/index.php?m=datatable&f=ajaxCustom&id=bug&method=browse' data-toggle='modal' data-type='ajax'>自定义列</a></li>");
+(function($) {
+    var kuid = '68afcc14100a0';
+    var editor = {"id":["comment","lastComment"],"tools":"bugTools"};
+    var K = KindEditor;
 
-            }
-            $dropmenu.append("<li><a href='javascript:saveDatatableConfig(\"mode\", \"datatable\", true);' id='switchToDatatable'>切换到高级表格</a></li>");
-            $dropdown.append($dropmenu).appendTo($btnToolbar);
+    var bugTools =
+    [ 'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic','underline', '|',
+    'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist', 'insertunorderedlist', '|',
+    'emoticons', 'image', 'code', 'link', '|', 'removeformat','undo', 'redo', 'fullscreen', 'source', 'about'];
+    var simpleTools =
+    [ 'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic','underline', '|',
+    'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist', 'insertunorderedlist', '|',
+    'emoticons', 'image', 'code', 'link', 'table', '|', 'removeformat','undo', 'redo', 'fullscreen', 'source', 'about'];
+    var fullTools =
+    [ 'formatblock', 'fontname', 'fontsize', 'lineheight', '|', 'forecolor', 'hilitecolor', '|', 'bold', 'italic','underline', 'strikethrough', '|',
+    'justifyleft', 'justifycenter', 'justifyright', 'justifyfull', '|',
+    'insertorderedlist', 'insertunorderedlist', '|',
+    'emoticons', 'image', 'insertfile', 'hr', '|', 'link', 'unlink', '/',
+    'undo', 'redo', '|', 'selectall', 'cut', 'copy', 'paste', '|', 'plainpaste', 'wordpaste', '|', 'removeformat', 'clearhtml','quickformat', '|',
+    'indent', 'outdent', 'subscript', 'superscript', '|',
+    'table', 'code', '|', 'pagebreak', 'anchor', '|',
+    'fullscreen', 'source', 'preview', 'about'];
+    var editorToolsMap = {fullTools: fullTools, simpleTools: simpleTools, bugTools: bugTools};
+
+    /* Kindeditor default options. */
+    var editorDefaults =
+    {
+        cssPath: [config.themeRoot + 'zui/css/min.css'],
+        width: '100%',
+        height: '200px',
+        filterMode: true,
+        bodyClass: 'article-content',
+        urlType: 'absolute',
+        uploadJson: createLink('file', 'ajaxUpload', 'uid=' + kuid),
+        langType: 'zh_CN',
+        cssData: 'html,body {background: none}.article-content{overflow:visible}.article-content, .article-content table td, .article-content table th {line-height: 1.3846153846; font-size: 13px;}.article-content .table-auto {width: auto!important; max-width: 100%;} ',
+        placeholder: "\u53ef\u4ee5\u5728\u7f16\u8f91\u5668\u76f4\u63a5\u8d34\u56fe\u3002",
+        placeholderStyle: {fontSize: '13px', color: '#888'},
+        pasteImage: {postUrl: createLink('file', 'ajaxPasteImage', 'uid=' + kuid)},
+        syncAfterBlur: true,
+        allowFileManager: false,
+        spellcheck: false
+    };
+
+    window.editor = {};
+
+    /* Init kindeditor. */
+    var setKindeditor = function(element, options)
+    {
+        var $editor  = $(element);
+        var pasted   = false;
+        var editorID = $editor.attr('id');
+        options      = $.extend({}, editorDefaults, $editor.data(), options);
+        if(editorID === undefined)
+        {
+            editorID = 'kindeditor-' + $.zui.uuid();
+            $editor.attr('id', editorID);
         }
-    };
-    $('#main .main-table').on('tableReload', addSettingButton);
-    addSettingButton();
 
-    $('#setShowModule').click(function()
-    {
-        if('jiangyuanchen' == 'guest') return;
-        datatableId   = 'bugBrowse';
-        var value     = $('#showModuleModal input[name="showModule"]:checked').val();
-        var allModule = $('#showModuleModal input[name="showAllModule"]:checked').val();
-        if(typeof allModule === 'undefined') allModule = false;
-        $.ajax(
+        var editorTool  = editorToolsMap[options.tools || editor.tools] || simpleTools;
+
+        /* Remove fullscreen in modal. */
+        if(config.onlybody == 'yes')
         {
-            type: "POST",
-            dataType: 'json',
-            data:
+            var newEditorTool = new Array();
+            for(i in editorTool)
             {
-                target: datatableId,
-                name: 'showModule',
-                value: value,
-                allModule: allModule,
-            },
-            success:function(){window.location.reload();},
-            url: '/index.php?m=datatable&f=ajaxSave'
-        });
-    });
+                if(editorTool[i] != 'fullscreen') newEditorTool.push(editorTool[i]);
+            }
+            editorTool = newEditorTool;
+        }
 
-    window.saveDatatableConfig = function(name, value, reload, global)
-    {
-        if('jiangyuanchen' == 'guest') return;
-        var datatableId = 'bugBrowse';
-        if(typeof value === 'object') value = JSON.stringify(value);
-        if(typeof global === 'undefined') global = 0;
-        $.ajax(
+        $.extend(options,
         {
-            type: "POST",
-            dataType: 'json',
-            data: {target: datatableId, name: name, value: value, global: global},
-            success:function(e){if(reload) window.location.reload();},
-            url: '/index.php?m=datatable&f=ajaxSave'
+            items: editorTool,
+            placeholder: $editor.attr('placeholder') || options.placeholder || '',
+            pasteImage: {postUrl: createLink('file', 'ajaxPasteImage', 'uid=' + kuid), placeholder: $editor.attr('placeholder') || "\u53ef\u4ee5\u5728\u7f16\u8f91\u5668\u76f4\u63a5\u8d34\u56fe\u3002"},
         });
-        $.get(createLink('score', 'ajax', "method=switchToDataTable"));
-    };
-});
-</script>
 
-<div class="modal fade" id="showModuleModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog w-600px">
+        try
+        {
+            var keditor = K.create('#' + editorID, options);
+            window.editor['#'] = window.editor[editorID] = keditor;
+            $editor.data('keditor', keditor);
+            return keditor;
+        }
+        catch(e){return false;}
+    };
+
+    /* Init kindeditor with jquery way. */
+    $.fn.kindeditor = function(options)
+    {
+        return this.each(function()
+        {
+            setKindeditor(this, options);
+        });
+    };
+
+    /* Init all kindeditor. */
+    var initKindeditor = function(afterInit)
+    {
+        var $submitBtn = $('form :input[type=submit]');
+        if($submitBtn.length)
+        {
+            $submitBtn.next('#uid').remove();
+            $submitBtn.after("<input type='hidden' id='uid' name='uid' value=" + kuid + ">");
+        }
+        if($.isFunction(afterInit)) afterInit();
+        $.each(editor.id, function(key, editorID)
+        {
+            setKindeditor('#' + editorID);
+        });
+    };
+
+    /* Init all kindeditors when document is ready. */
+    $(initKindeditor);
+}(jQuery));
+</script>
+<script>sysurl = "https:\/\/rdms.streamax.com";</script>
+<script>confirmUnlinkBugcase = "\u60a8\u786e\u8ba4\u79fb\u9664\u8be5\u7528\u4f8b\u5417\uff1f";</script>
+
+<div id="mainMenu" class="clearfix">
+  <div class="btn-toolbar pull-left">
+        <a href='/index.php?m=my&f=work&mode=bug&type=assignedTo' class='btn btn-secondary'><i class="icon icon-back icon-sm"></i> 返回</a>
+    <div class="divider"></div>
+        <div class="page-title">
+      <span class="label label-id">138363</span>
+      <span class="text" title="【SIT-V3.17.4-P11】【Shipper】【报警中心-报警列表】FTCloud打标后shipper报警详情标题不展示标签" style='color: '>【SIT-V3.17.4-P11】【Shipper】【报警中心-报警列表】FTCloud打标后shipper报警详情标题不展示标签</span>
+          </div>
+  </div>
+    <div class="btn-toolbar pull-right">
+            <a href='/index.php?m=bug&f=create&productID=43&branch=0&extra=moduleID=84798,projectID=1442,executionID=11580' class='btn btn-primary' data-app='qa'><i class='icon icon-plus'></i> 提Bug</a>
+      </div>
+  </div>
+<div id="mainContent" class="main-row">
+  <div class="main-col col-8">
+    <div class="cell">
+      <div class="detail">
+        <div class="detail-title">重现步骤</div>
+        <div class="detail-content article-content">
+          <p><strong>[环境]</strong><br /><a href='https://test-saas-2166.streamax.com' target='_blank'>https://test-saas-2166.streamax.com</a>:20551/<span></span>&nbsp; &nbsp; &nbsp; <span class="starry-descriptions-item-label" style="color:rgba(0,0,0,0.45);font-family:'-apple-system', BlinkMacSystemFont;"><span class="starry-descriptions-item-label-colon">&nbsp;<span style="color:#000000;">shipper</span></span></span><span class="starry-descriptions-item-content" style="color:#000000;font-family:'-apple-system', BlinkMacSystemFont;">/</span>1qaz2WSX!<br /><strong>[步骤]</strong><br />1、FTCloud处理报警打标签</p>
+<p>2、进入shipper查看该报警标题是否展示标签（点击报警处理按钮查看弹窗标签框是否回显）</p>
+<p><strong>[期望]</strong></p>
+<p>1、正常展示（标签文本框正确回显）</p>
+<p><strong>[结果]</strong></p>
+<p><img onload="setImageSize(this,0)" src="/index.php?m=file&f=read&t=png&fileID=401724" alt="" /></p>
+<p><img onload="setImageSize(this,0)" src="/index.php?m=file&f=read&t=png&fileID=401725" alt="" /></p>
+<p><img onload="setImageSize(this,0)" src="/index.php?m=file&f=read&t=png&fileID=401726" alt="" /></p>
+<p><span style="color:rgba(0,0,0,0.65);font-family:'-apple-system', BlinkMacSystemFont;"></span></p>        </div>
+          <div style="height: 10px"></div>
+                                                                            </div>
+                </div>
+        <div class='cell'><div class="detail histories" id='actionbox'
+style="padding: 10px;border-radius: 4px;margin: 0;border: 1px solid #eee;"
+data-textDiff="文本格式" data-original="原始格式">
+<style>.histories-list > li{word-break: break-word; word-wrap: break-word;}</style>
+  <script>
+  $(function()
+  {
+      var diffButton = '<button type="button" class="btn btn-mini btn-icon btn-strip"><i class="icon icon-code icon-sm"></i></button>';
+      var newBoxID = '';
+      var oldBoxID = '';
+      $('blockquote.textdiff').each(function()
+      {
+          newBoxID = $(this).parent().attr('id');
+          if(newBoxID != oldBoxID)
+          {
+              oldBoxID = newBoxID;
+              if($(this).html() != $(this).next().html()) $(this).closest('.history-changes').before(diffButton);
+          }
+      });
+  });
+  </script>
+    <div class="detail-title">
+      历史记录 &nbsp;
+    <button type="button" class="btn btn-mini btn-icon btn-reverse" title='切换顺序'>
+      <i class="icon icon-arrow-up icon-sm"></i>
+    </button>
+    <button type="button" class="btn btn-mini btn-icon btn-expand-all" title='切换显示'>
+      <i class="icon icon-plus icon-sm"></i>
+    </button>
+     <button type='button' class='btn btn-link pull-right btn-comment' ><i class="icon icon-chat-line"></i> 添加备注</button><div class="modal fade modal-comment">
+  <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><i class="icon icon-close"></i></button>
-        <h4 class="modal-title"><i class="icon-cog-outline"></i> 模块设置</h4>
+        <h4 class="modal-title">添加备注</h4>
       </div>
       <div class="modal-body">
-        <form class='form-condensed' method='post' target='hiddenwin' action='/index.php?m=datatable&f=ajaxSave'>
-          <table class='table table-form'>
-            <tr>
-              <td class='w-150px'>列表页是否显示模块名</td>
-              <td><label class='radio-inline'><input type='radio' name='showModule' value='0'  checked ='checked' id='showModule0' /> 不显示</label><label class='radio-inline'><input type='radio' name='showModule' value='base'  id='showModulebase' /> 只显示一级模块</label><label class='radio-inline'><input type='radio' name='showModule' value='end'  checked ='checked' id='showModuleend' /> 只显示最后一级模块</label></td>
-            </tr>
-                        <tr>
-              <td colspan='2' class='text-center'><button type='button' id='setShowModule' class='btn btn-primary'>保存</button></td>
-            </tr>
-          </table>
+        <form class="load-indicator" action="/index.php?m=action&f=comment&objectType=bug&objectID=138363" target='hiddenwin' method='post'>
+          <div class="form-group">
+            <textarea id='comment' name='comment' class="form-control" rows="8" autofocus="autofocus"></textarea>
+          </div>
+          <div class="form-group form-actions text-center">
+            <button type="submit" class="btn btn-primary btn-wide">保存</button>
+            <button type="button" class="btn btn-wide" data-dismiss="modal">关闭</button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 </div>
-<script>browseType = "unclosed";</script>
-<script>moduleID = 0;</script>
-<script>bugBrowseType = "unclosed";</script>
-<script>flow = "full";</script>
-<script>productID = 831;</script>
-<script>branch = 0;</script>
-<div id="mainMenu" class="clearfix">
-  <div id="sidebarHeader">
-    <div class="title">
-      所有模块    </div>
+<script>
+$(function()
+{
+    $body = $('body', window.parent.document);
+    if($body.hasClass('hide-modal-close')) $body.removeClass('hide-modal-close');
+});
+</script>  </div>
+      <div class="detail-content">
+      <ol class='histories-list'>
+                        <li value='1'>
+                2025-07-25 17:06:50, 由 <strong>刘庆福</strong> 创建。
+                      </li>
+                  <li value='2'>
+                2025-07-25 17:20:41, 由 <strong>张昌军</strong> 指派给 <strong>江原臣</strong>。
+                <button type='button' class='btn btn-mini switch-btn btn-icon btn-expand' title='切换显示'><i class='change-show icon icon-plus icon-sm'></i></button>
+        <div class='history-changes' id='changeBox3'>
+          修改了 <strong><i>指派给</i></strong>，旧值为 "zhangchangjun"，新值为 "jiangyuanchen"。<br />
+        </div>
+                      </li>
+                  <li value='3'>
+                2025-07-26 16:54:37, 由 <strong>江原臣</strong> 确认Bug。
+                <button type='button' class='btn btn-mini switch-btn btn-icon btn-expand' title='切换显示'><i class='change-show icon icon-plus icon-sm'></i></button>
+        <div class='history-changes' id='changeBox4'>
+          修改了 <strong><i>是否确认</i></strong>，旧值为 "0"，新值为 "1"。<br />
+        </div>
+                      </li>
+                  <li value='4'>
+                2025-07-26 16:56:16, 由 <strong>江原臣</strong> 解决，方案为 <strong>延期处理</strong> 。                <button type='button' class='btn btn-mini switch-btn btn-icon btn-expand' title='切换显示'><i class='change-show icon icon-plus icon-sm'></i></button>
+        <div class='history-changes' id='changeBox5'>
+          修改了 <strong><i>解决日期   </i></strong>，旧值为 ""，新值为 "2025-07-26 16:54:40"。<br />
+修改了 <strong><i>平台/设备  </i></strong>，旧值为 "web"，新值为 ""。<br />
+修改了 <strong><i>Bug归属      </i></strong>，旧值为 "2"，新值为 ""。<br />
+修改了 <strong><i>Bug归属团队</i></strong>，旧值为 "3"，新值为 ""。<br />
+修改了 <strong><i>解决者      </i></strong>，旧值为 ""，新值为 "jiangyuanchen"。<br />
+修改了 <strong><i>解决方案   </i></strong>，区别为：
+<blockquote class='textdiff'>001- <del></del><br />
+001+ <ins>postponed</ins></blockquote>
+<blockquote class='original'>001- <del></del><br />
+001+ <ins>postponed</ins></blockquote>        </div>
+                                 <button type='button' class='btn btn-link btn-icon btn-sm btn-edit-comment' title='修改备注'><i class="icon icon-pencil"></i></button>        <style>.comment .comment-content{width: 98%}</style>
+                <div class='article-content comment'>
+          <div class='comment-content'><p>经讨论，<span>3.16.3版本就已经存在这个问题了，</span>该问题可以延期处理。</p>
+<p><br /></p></div>
+        </div>
+                <form method='post' class='comment-edit-form' action='/index.php?m=action&f=editComment&actionID=8945873'>
+          <div class="form-group">
+          <textarea name='lastComment' id='lastComment' rows='8' autofocus='autofocus'>&lt;p&gt;经讨论，&lt;span&gt;3.16.3版本就已经存在这个问题了，&lt;/span&gt;该问题可以延期处理。&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;</textarea>
+          </div>
+          <div class="form-group form-actions">
+           <button type='submit' id='submit' class='btn btn-wide btn-primary'  data-loading='稍候...'>保存</button>           <button type='button' class='btn btn-wide btn-hide-form' >关闭</button>          </div>
+        </form>
+                      </li>
+          </ol>
   </div>
-  <div class="btn-toolbar pull-left">
-    <a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=all' class='btn btn-link '><span class='text'>所有</span></a>
-<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=unclosed' class='btn btn-link btn-active-text'><span class='text'>未关闭</span> <span class='label label-light label-badge'>0</span></a>
-<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=openedbyme' class='btn btn-link '><span class='text'>由我创建</span></a>
-<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=assigntome' class='btn btn-link '><span class='text'>指派给我</span></a>
-<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=resolvedbyme' class='btn btn-link '><span class='text'>由我解决</span></a>
-<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=toclosed' class='btn btn-link '><span class='text'>待关闭</span></a>
-<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=unresolved' class='btn btn-link '><span class='text'>未解决</span></a>
-<div class='btn-group'><a href='javascript:;' data-toggle='dropdown' class='btn btn-link '>更多 <span class='caret'></span></a><ul class='dropdown-menu'><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=unconfirmed' class='btn btn-link '><span class='text'>未确认</span></a>
-</li><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=assigntonull' class='btn btn-link '><span class='text'>未指派</span></a>
-</li><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=longlifebugs' class='btn btn-link '><span class='text'>久未处理</span></a>
-</li><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=postponedbugs' class='btn btn-link '><span class='text'>被延期</span></a>
-</li><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=overduebugs' class='btn btn-link '><span class='text'>过期Bug</span></a>
-</li><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=needconfirm' class='btn btn-link '><span class='text'>产品需求变动</span></a>
-</li></ul></div>    <a class="btn btn-link querybox-toggle" id='bysearchTab'><i class="icon icon-search muted"></i> 搜索</a>
-  </div>
-    <div class="btn-toolbar pull-right">
-    <a href='/index.php?m=bug&f=report&productID=831&browseType=unclosed&branchID=0&moduleID=0' class='btn btn-link '  data-app="qa"><i class='icon-common-report icon-bar-chart muted'></i> <span class='text'>报表</span></a>
-    <div class='btn-group'>
-      <button type='button' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>
-        <i class="icon icon-export muted"></i> <span class="text"> 导出</span> <span class="caret"></span></button>
-      </button>
-      <ul class='dropdown-menu' id='exportActionMenu'>
-        <li ><a href='/index.php?m=bug&f=export&productID=831&orderBy=id_desc&browseType=unclosed' class='export'>导出数据</a>
-</li>      </ul>
+</div>
+</div>
+        <div class='main-actions'>
+      <div class="btn-toolbar">
+        <a href='/index.php?m=my&f=work&mode=bug&type=assignedTo' id='back' class='btn' title=返回[快捷键:Alt+↑]><i class="icon-goback icon-back"></i> 返回</a>
+                <div class='divider'></div>
+        <a href='/index.php?m=bug&f=assignTo&bugID=138363&onlybody=yes' class='btn btn-link iframe'  data-app="bugmarket"><i class='icon-bug-assignTo icon-hand-right'></i> <span class='text'>指派</span></a>
+<a href='/index.php?m=bug&f=resolve&bugID=138363&onlybody=yes' class='btn btn-link iframe showinonlybody'  data-app="bugmarket"><i class='icon-bug-resolve icon-checked'></i> <span class='text'>解决</span></a>
+<a href='/index.php?m=story&f=create&product=43&branch=0&module=0&story=0&execution=0&bugID=138363' class='btn btn-link ' data-app='bugmarket'><i class='icon-story-create icon-lightbulb'></i> <span class='text'>转产品需求</span></a>
+<a href='/index.php?m=testcase&f=create&productID=43&branch=0&moduleID=0&from=bug&bugID=138363' class='btn btn-link '  data-app="bugmarket"><i class='icon-testcase-create icon-sitemap'></i> <span class='text'>建用例</span></a>
+<div class='divider'></div><a href='/index.php?m=bug&f=edit&bugID=138363' class='btn btn-link ' title='编辑Bug'  data-app="bugmarket"><i class='icon-common-edit icon-edit'></i></a><a href='/index.php?m=bug&f=create&productID=43&branch=0&extras=bugID=138363' class='btn btn-link ' title='复制Bug'  data-app="bugmarket"><i class='icon-common-copy icon-copy'></i></a>              </div>
     </div>
-                <div class='btn-group dropdown'>
-      <a href='/index.php?m=bug&f=create&productID=831&branch=0&extra=moduleID=0' class='btn btn-primary create-bug-btn '><i class='icon-plus'></i> 提Bug</a>
-            <button type='button' class='btn btn-primary dropdown-toggle' data-toggle='dropdown'><span class='caret'></span></button>
-      <ul class='dropdown-menu'>
-        <li><a href='/index.php?m=bug&f=create&productID=831&branch=0&extra=moduleID=0' >提Bug</a>
-</li>
-        <li><a href='/index.php?m=bug&f=batchCreate&productID=831&branch=0&executionID=0&moduleID=0' >批量提Bug</a>
-</li>
-      </ul>
-          </div>
-          </div>
   </div>
-<div id="mainContent" class="main-row fade">
-  <div class="side-col" id="sidebar">
-    <div class="sidebar-toggle"><i class="icon icon-angle-left"></i></div>
+  <div class="side-col col-4">
     <div class="cell">
-            <hr class="space">
-      <div class="text-center text-muted"><div>您现在还没有模块信息</div><div>请维护测试模块</div></div>
-      <hr class="space">
-                  <div class="text-center">
-        <a href='/index.php?m=tree&f=browse&productID=831&view=bug&currentModuleID=0&branch=0&from=qa' class='btn btn-info btn-wide' data-app="qa">维护模块</a>
-        <hr class="space-sm" />
+      <div class='tabs'>
+        <ul class='nav nav-tabs'>
+          <li class='active'><a href='#legendBasicInfo' data-toggle='tab'>基本信息</a></li>
+          <li><a href='#legendExecStoryTask' data-toggle='tab'>项目/迭代/产品需求/任务</a></li>
+        </ul>
+        <div class='tab-content'>
+          <div class='tab-pane active' id='legendBasicInfo'>
+            <table class="table table-data">
+              <tbody>
+                <tr valign='middle'>
+                  <th class='thWidth'>所属产品</th>
+                  <td><a href='/index.php?m=product&f=browse&productID=43' data-app='product'>FT-V3.X</a>
+</td>
+                </tr>
+                                <tr>
+                  <th>所属模块</th>
+                                    <td title='海外货运/Shipper/报警中心/报警列表/报警详情'><a href='/index.php?m=bug&f=browse&productID=43&branch=0&browseType=byModule&param=53355'  data-app="bugmarket">海外货运</a>
+&nbsp;<i class="icon-angle-right"></i>&nbsp;<a href='/index.php?m=bug&f=browse&productID=43&branch=0&browseType=byModule&param=27966'  data-app="bugmarket">Shipper</a>
+&nbsp;<i class="icon-angle-right"></i>&nbsp;<a href='/index.php?m=bug&f=browse&productID=43&branch=0&browseType=byModule&param=27977'  data-app="bugmarket">报警中心</a>
+&nbsp;<i class="icon-angle-right"></i>&nbsp;<a href='/index.php?m=bug&f=browse&productID=43&branch=0&browseType=byModule&param=27983'  data-app="bugmarket">报警列表</a>
+&nbsp;<i class="icon-angle-right"></i>&nbsp;<a href='/index.php?m=bug&f=browse&productID=43&branch=0&browseType=byModule&param=84798'  data-app="bugmarket">报警详情</a>
+</td>
+                </tr>
+                <tr valign='middle'>
+                  <th>所属计划</th>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th>Bug类型</th>
+                  <td>代码错误</td>
+                </tr>
+                <tr>
+                                    <th>严重程度</th>
+                  <td>
+                                        <span class='label-severity-custom' data-severity='3' title='一般'>一般</span>
+                                      </td>
+                </tr>
+                <tr>
+                  <th>优先级</th>
+                  <td><span class='label-pri label-pri-2' title='高'>高</span></td>
+                </tr>
+                <tr>
+                  <th>Bug状态</th>
+                  <td><span class='status-bug status-active'>激活</span></td>
+                </tr>
+                <tr>
+                  <th>激活次数</th>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <th>激活日期</th>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th>是否确认</th>
+                  <td>是</td>
+                </tr>
+                <tr>
+                  <th>当前指派</th>
+                  <td>江原臣 于 2025-07-26 16:56:16</td>
+                </tr>
+                <tr>
+                  <th>截止日期</th>
+                  <td>
+                    0000-00-00                  </td>
+                </tr>
+                <tr>
+                  <th>操作系统</th>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th>浏览器</th>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th>关键词</th>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th>抄送给</th>
+                  <td> </td>
+                </tr>
+                <tr>
+                    <th>Bug价值属性</th>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>平台/设备</th>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>Bug归属</th>
+                    <td id='attributionBox'></td>
+                </tr>
+                <tr>
+                    <th>Bug归属团队</th>
+                    <td id='attributionTeamBox'></td>
+                </tr>
+                <tr>
+                    <th>发生概率</th>
+                    <td id='attributionBox'>必现</td>
+                </tr>
+                <tr valign='middle'>
+                    <th class='thWidth'>是否共性问题</th>
+                    <td>否</td>
+                </tr>
+                              </tbody>
+            </table>
+          </div>
+          <div class='tab-pane' id='legendExecStoryTask'>
+            <table class='table table-data'>
+              <tbody>
+                                <tr>
+                  <th class='w-70px'>所属项目</th>
+                  <td><a href='/index.php?m=project&f=view&projectID=1442' >FT V3基线</a>
+</td>
+                </tr>
+                                <tr>
+                  <th class='w-70px'>所属执行</th>
+                  <td><a href='/index.php?m=execution&f=browse&executionID=11580' >FT-V3.17.4</a>
+</td>
+                </tr>
+                <tr class='nofixed'>
+                  <th>相关需求</th>
+                  <td>
+                                      </td>
+                </tr>
+                <tr>
+                  <th>相关任务</th>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="main-col">
-    <div class="cell" id="queryBox" data-module='bug'></div>
-        <div class="table-empty-tip">
-      <p>
-        <span class="text-muted">暂时没有Bug。</span>
-                <a href='/index.php?m=bug&f=create&productID=831&branch=0&extra=moduleID=0' class='btn btn-info'><i class='icon icon-plus'></i> 提Bug</a>
-              </p>
+    <div class="cell">
+      <div class='tabs'>
+        <ul class='nav nav-tabs'>
+          <li class='active'><a href='#legendLife' data-toggle='tab'>Bug的一生</a></li>
+          <li><a href='#legendMisc' data-toggle='tab'>其他相关</a></li>
+        </ul>
+        <div class='tab-content'>
+          <div class='tab-pane active' id='legendLife'>
+            <table class="table table-data">
+              <tbody>
+                <tr>
+                  <th class='thWidth'>由谁创建</th>
+                  <td> 刘庆福 于 2025-07-25 17:06:50</td>
+                </tr>
+                <tr>
+                  <th>影响版本</th>
+                  <td>
+                    FT-V3.X FT-V3.17.4-P11<br />                  </td>
+                </tr>
+                <tr>
+                  <th>由谁解决</th>
+                  <td>江原臣 于 2025-07-26 16:54:40</td>
+                </tr>
+                <tr>
+                  <th>解决版本</th>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th>解决方案</th>
+                  <td>
+                    延期处理                  </td>
+                </tr>
+                <tr>
+                  <th>由谁关闭</th>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th>最后修改</th>
+                  <td>江原臣 于 2025-07-26 16:56:16</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class='tab-pane' id='legendMisc'>
+            <table class="table table-data">
+              <tbody>
+                <tr class='text-top'>
+                  <th class='w-80px'>相关Bug</th>
+                  <td>
+                                      </td>
+                </tr>
+                
+                                <tr>
+                    <th class='w-60px'>关联用例</th>
+                    <td>
+                                            </td>
+                </tr>
+                
+                <!--
+                <tr>
+                  <th></th>
+                  <td>
+                                    </td>
+                </tr>
+                -->                                              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
       </div>
 </div>
+
+<div id="mainActions" class='main-actions'>
+  <nav class='container'><a href='/index.php?m=bug&f=view&ID=141480#app=bugmarket' id='prevPage' class='btn' title='#141480 【4097】【服务监控日志】app1服务器日志报错 [快捷键:←]'><i class="icon-pre icon-chevron-left"></i></a>
+<a href='/index.php?m=bug&f=view&ID=133012#app=bugmarket' id='nextPage' class='btn' title='#133012 【墨西哥自营升级V3.17.5】-【取证中心-报警管理】-导出PDF添加马赛克，没有图片 [快捷键:→]'><i class="icon-pre icon-chevron-right"></i></a>
+</nav></div>
+<link rel='stylesheet' href='/js/kindeditor/plugins/code/prettify.css?v=15.5' type='text/css' media='screen' />
+<script src='/js/kindeditor/plugins/code/prettify.js?v=15.5'></script>
 <script>
-$('#module' + moduleID).closest('li').addClass('active');
-var branchID = $.cookie('bugBranch');
-$('#branch' + branchID).closest('li').addClass('active');
+$(window.prettyPrint);
 </script>
 </div><script>
 $.initSidebar();
@@ -997,10 +1278,6 @@ function changiscommon(){
         $("#qualityaffect").val('');
     }
 }
-$(function()
-{
-    if($('#bugList thead th.c-title').width() < 150) $('#bugList thead th.c-title').width(150);
-});
 
 </script>
 <link rel='stylesheet' href='/theme/default/floating-window.css?v=15.5' type='text/css' media='screen' />
