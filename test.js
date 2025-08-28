@@ -1,136 +1,248 @@
-import { spawn } from 'child_process';
+#!/usr/bin/env node
+import { RDMSMCPServer } from './index.js';
 
-async function runTests() {
-  const username = process.argv[2];
-  const password = process.argv[3];
-  const testType = process.argv[4] || 'all';
-  
-  // 如果没有提供用户名密码，只进行基本的语法检查
-  if (!username || !password) {
-    console.log('🔍 运行基本语法检查...');
+// 测试配置
+const TEST_CONFIG = {
+  baseUrl: process.env.RDMS_BASE_URL || 'https://rdms.streamax.com',
+  username: process.env.RDMS_USERNAME || 'jiangyuanchen',
+  password: process.env.RDMS_PASSWORD || 'Rm123456',
+  testBugId: process.env.TEST_BUG_ID || '141480',
+  testDefectId: process.env.TEST_DEFECT_ID || '11636',
+  testImageUrl: process.env.TEST_IMAGE_URL || 'https://rdms.streamax.com/index.php?m=file&f=read&t=png&fileID=411376'
+};
+
+// 所有可用的测试方法
+const AVAILABLE_TESTS = {
+  'rdms_login': {
+    description: '测试登录功能',
+    args: {
+      baseUrl: TEST_CONFIG.baseUrl,
+      username: TEST_CONFIG.username,
+      password: TEST_CONFIG.password
+    }
+  },
+  'rdms_get_bug': {
+    description: '测试获取Bug详情',
+    args: {
+      bugId: TEST_CONFIG.testBugId
+    }
+  },
+  'rdms_get_market_defect': {
+    description: '测试获取市场缺陷详情',
+    args: {
+      defectId: TEST_CONFIG.testDefectId
+    }
+  },
+  'rdms_get_my_bugs': {
+    description: '测试获取我的Bug',
+    args: {
+      status: 'active',
+      limit: 5
+    }
+  },
+  'rdms_get_market_defects': {
+    description: '测试获取我的市场缺陷',
+    args: {
+      limit: 5
+    }
+  },
+  'rdms_download_image': {
+    description: '测试下载图片',
+    args: {
+      imageUrl: TEST_CONFIG.testImageUrl,
+      analyze: true
+    }
+  }
+};
+
+class RDMSTester {
+  constructor() {
+    this.server = new RDMSMCPServer();
+    this.results = [];
+  }
+
+  async testTool(toolName, args) {
+    console.log(`\n🧪 测试 ${toolName}...`);
+    console.log(`📝 描述: ${AVAILABLE_TESTS[toolName]?.description || '未知测试'}`);
+    console.log(`📋 参数:`, JSON.stringify(args, null, 2));
+    
+    const startTime = Date.now();
+    
     try {
-      // 导入模块进行语法检查
-      await import('./index.js');
-      console.log('✅ 语法检查通过');
-      console.log('\n📝 完整测试用法: node test.js <用户名> <密码> [测试类型]');
-      console.log('测试类型: all, login, bug, dashboard, pending, market, my-bugs');
-      return;
+      let result;
+      
+      // 直接调用服务器方法
+      switch (toolName) {
+        case 'rdms_login':
+          result = await this.server.login(args.baseUrl, args.username, args.password);
+          break;
+        case 'rdms_get_bug':
+          result = await this.server.getBug(args.bugId);
+          break;
+        case 'rdms_get_market_defect':
+          result = await this.server.getMarketDefect(args.defectId);
+          break;
+        case 'rdms_get_my_bugs':
+          result = await this.server.getMyBugs(args.status, args.limit);
+          break;
+        case 'rdms_get_market_defects':
+          result = await this.server.getMarketDefects(args.limit);
+          break;
+        case 'rdms_download_image':
+          result = await this.server.downloadImage(args.imageUrl, args.filename, args.analyze);
+          break;
+        default:
+          throw new Error(`未知的测试方法: ${toolName}`);
+      }
+      
+      const duration = Date.now() - startTime;
+      
+      console.log(`✅ 成功 (${duration}ms)`);
+      console.log(`📤 结果:`, JSON.stringify(result, null, 2));
+      
+      this.results.push({
+        tool: toolName,
+        status: 'success',
+        duration,
+        result
+      });
+      
+      return result;
     } catch (error) {
-      console.error('❌ 语法检查失败:', error.message);
-      process.exit(1);
+      const duration = Date.now() - startTime;
+      
+      console.log(`❌ 失败 (${duration}ms)`);
+      console.log(`🚨 错误:`, error.message);
+      
+      this.results.push({
+        tool: toolName,
+        status: 'error',
+        duration,
+        error: error.message
+      });
+      
+      return { error: error.message };
     }
   }
 
-  // 设置环境变量
-  const env = {
-    ...process.env,
-    RDMS_BASE_URL: 'https://rdms.streamax.com',
-    RDMS_USERNAME: username,
-    RDMS_PASSWORD: password
-  };
+  async runSingleTest(toolName) {
+    if (!AVAILABLE_TESTS[toolName]) {
+      console.log(`❌ 未知的测试方法: ${toolName}`);
+      console.log(`📋 可用的测试方法:`);
+      Object.keys(AVAILABLE_TESTS).forEach(name => {
+        console.log(`   - ${name}: ${AVAILABLE_TESTS[name].description}`);
+      });
+      return;
+    }
 
-  console.log('🚀 RDMS MCP服务器测试套件\n');
-
-  if (testType === 'all' || testType === 'login') {
-    console.log('1️⃣ 测试登录...');
-    await testTool('rdms_login', {
-      baseUrl: 'https://rdms.streamax.com',
-      username: username,
-      password: password
-    }, env);
+    console.log(`🎯 单独测试: ${toolName}`);
+    await this.testTool(toolName, AVAILABLE_TESTS[toolName].args);
+    this.printSummary();
   }
 
-  if (testType === 'all' || testType === 'bug') {
-    const bugId = process.argv[5] || '141480';
-    console.log(`\n2️⃣ 测试获取BUG ${bugId}...`);
-    await testTool('rdms_get_bug', { bugId: bugId }, env);
-  }
-
-  if (testType === 'all' || testType === 'dashboard') {
-    console.log('\n3️⃣ 测试工作面板...');
-    await testTool('rdms_get_work_dashboard', {}, env);
-  }
-
-  if (testType === 'all' || testType === 'pending') {
-    console.log('\n4️⃣ 测试待处理BUG...');
-    await testTool('rdms_get_pending_bugs', { limit: 10 }, env);
-  }
-
-  if (testType === 'all' || testType === 'market') {
-    console.log('\n5️⃣ 测试市场缺陷...');
-    await testTool('rdms_get_market_defects', { limit: 10 }, env);
-  }
-
-  if (testType === 'all' || testType === 'my-bugs') {
-    console.log('\n6️⃣ 测试我的BUG...');
-    await testTool('rdms_get_my_bugs', { status: 'active', limit: 10 }, env);
-  }
-
-  console.log('\n✅ 测试完成！');
-}
-
-async function testTool(toolName, args, env) {
-  return new Promise((resolve) => {
-    const child = spawn('node', ['index.js'], { 
-      env: env,
-      stdio: ['pipe', 'pipe', 'pipe']
-    });
-
-    let output = '';
+  async runAllTests() {
+    console.log('🚀 开始运行所有测试...\n');
     
-    child.stdout.on('data', (data) => {
-      output += data.toString();
-    });
-
-    child.stderr.on('data', (data) => {
-      console.log('Zentao MCP server running on stdio');
-    });
-
-    child.on('close', () => {
-      try {
-        const lines = output.trim().split('\n').filter(line => line.trim());
-        const lastLine = lines[lines.length - 1];
-        
-        if (!lastLine) {
-          console.log(`❌ ${toolName} 失败: 无响应`);
-          resolve();
-          return;
-        }
-
-        const response = JSON.parse(lastLine);
-        
-        if (response.result && response.result.content) {
-          let content;
-          try {
-            content = JSON.parse(response.result.content[0].text);
-          } catch {
-            content = response.result.content[0].text;
-          }
-          console.log(`✅ ${toolName} 成功:`);
-          console.log(typeof content === 'string' ? content : JSON.stringify(content, null, 2));
-        } else if (response.error) {
-          console.log(`❌ ${toolName} 失败:`, response.error.message);
-        }
-      } catch (error) {
-        console.log(`❌ ${toolName} 解析失败:`, error.message);
-        console.log('原始输出:', output.substring(0, 500));
+    // 首先测试登录
+    if (AVAILABLE_TESTS['rdms_login']) {
+      await this.testTool('rdms_login', AVAILABLE_TESTS['rdms_login'].args);
+    }
+    
+    // 然后测试其他方法
+    for (const [toolName, config] of Object.entries(AVAILABLE_TESTS)) {
+      if (toolName !== 'rdms_login') {
+        await this.testTool(toolName, config.args);
       }
-      resolve();
+    }
+    
+    this.printSummary();
+  }
+
+  printSummary() {
+    console.log('\n📊 测试总结');
+    console.log('='.repeat(50));
+    
+    const successful = this.results.filter(r => r.status === 'success').length;
+    const failed = this.results.filter(r => r.status === 'error').length;
+    const totalTime = this.results.reduce((sum, r) => sum + r.duration, 0);
+    
+    console.log(`✅ 成功: ${successful}`);
+    console.log(`❌ 失败: ${failed}`);
+    console.log(`⏱️  总耗时: ${totalTime}ms`);
+    
+    if (failed > 0) {
+      console.log('\n🚨 失败的测试:');
+      this.results
+        .filter(r => r.status === 'error')
+        .forEach(r => {
+          console.log(`   - ${r.tool}: ${r.error}`);
+        });
+    }
+    
+    console.log('\n📋 详细结果:');
+    this.results.forEach(r => {
+      const status = r.status === 'success' ? '✅' : '❌';
+      console.log(`   ${status} ${r.tool} (${r.duration}ms)`);
     });
+  }
 
-    const request = {
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'tools/call',
-      params: {
-        name: toolName,
-        arguments: args
-      }
-    };
+  printUsage() {
+    console.log(`
+🧪 RDMS MCP 测试工具
 
-    child.stdin.write(JSON.stringify(request) + '\n');
-    child.stdin.end();
-  });
+用法:
+  node test.js                    # 运行所有测试
+  node test.js [method_name]      # 运行指定测试
+
+可用的测试方法:
+${Object.entries(AVAILABLE_TESTS).map(([name, config]) => 
+  `  ${name.padEnd(25)} - ${config.description}`
+).join('\n')}
+
+环境变量配置:
+  RDMS_BASE_URL      - RDMS系统地址
+  RDMS_USERNAME      - 用户名
+  RDMS_PASSWORD      - 密码
+  TEST_BUG_ID        - 测试用的Bug ID
+  TEST_DEFECT_ID     - 测试用的缺陷ID
+  TEST_IMAGE_URL     - 测试用的图片URL
+
+示例:
+  node test.js rdms_login
+  node test.js rdms_get_bug
+  RDMS_BASE_URL=http://demo.zentao.net node test.js
+`);
+  }
 }
 
-runTests().catch(console.error);
+async function main() {
+  const tester = new RDMSTester();
+  const args = process.argv.slice(2);
+  
+  if (args.length === 0) {
+    // 运行所有测试
+    await tester.runAllTests();
+  } else if (args[0] === '--help' || args[0] === '-h') {
+    // 显示帮助
+    tester.printUsage();
+    return;
+  } else {
+    // 运行指定测试
+    const toolName = args[0];
+    await tester.runSingleTest(toolName);
+  }
+}
+
+// 错误处理
+process.on('unhandledRejection', (error) => {
+  console.error('🚨 未处理的Promise拒绝:', error);
+  process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('🚨 未捕获的异常:', error);
+  process.exit(1);
+});
+
+// 运行测试
+main().catch(console.error);

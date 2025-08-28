@@ -160,7 +160,46 @@ export RDMS_PASSWORD="your_password"
 
 ## 测试
 
-运行测试脚本：
+### 新版测试脚本（推荐）
+
+使用改进的测试脚本来验证所有8个对外接口：
+
+```bash
+# 查看帮助
+node test.js --help
+
+# 运行所有测试
+node test.js
+
+# 运行单个测试
+node test.js rdms_login
+node test.js rdms_get_bug
+node test.js rdms_search_bugs
+node test.js rdms_get_my_bugs
+node test.js rdms_get_market_defect
+node test.js rdms_search_market_defects
+node test.js rdms_get_market_defects
+node test.js rdms_download_image
+```
+
+### 环境变量配置
+
+```bash
+# Windows PowerShell
+$env:RDMS_BASE_URL="http://your-rdms-system.com"
+$env:RDMS_USERNAME="your-username"
+$env:RDMS_PASSWORD="your-password"
+
+# Linux/Mac
+export RDMS_BASE_URL="http://your-rdms-system.com"
+export RDMS_USERNAME="your-username"
+export RDMS_PASSWORD="your-password"
+```
+
+详细的测试使用指南请参考 [TEST_USAGE.md](./TEST_USAGE.md)
+
+### 旧版测试脚本
+
 ```bash
 node test.js <用户名> <密码> [测试类型]
 ```

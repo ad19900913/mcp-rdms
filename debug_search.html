@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang='zh-cn'>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="renderer" content="webkit">
+  <title>导用例产品-开发使用-Bug - 锐明RDMS</title>
+<script>window.config={"webRoot":"\/","debug":true,"appName":"","cookieLife":30,"requestType":"GET","requestFix":"-","moduleVar":"m","methodVar":"f","viewVar":"t","defaultView":"html","themeRoot":"\/theme\/","currentModule":"bug","currentMethod":"browse","clientLang":"zh-cn","requiredFields":"","router":"\/index.php","save":"\u4fdd\u5b58","runMode":"","timeout":0,"pingInterval":""};
+window.lang={"submitting":"\u7a0d\u5019...","save":"\u4fdd\u5b58","expand":"\u5c55\u5f00\u5168\u90e8","timeout":"\u8fde\u63a5\u8d85\u65f6\uff0c\u8bf7\u68c0\u67e5\u7f51\u7edc\u73af\u5883\uff0c\u6216\u91cd\u8bd5\uff01"};
+
+</script>
+<script>config.onlybody = "no";</script><link rel='stylesheet' href='/theme/zui/css/min.css?t=1756300284?v=15.5' type='text/css' media='screen' />
+<link rel='stylesheet' href='/theme/default/style.css?t=1756300284?v=15.5' type='text/css' media='screen' />
+<link rel='stylesheet' href='/theme/lang/zh-cn.css?v=15.5' type='text/css' media='screen' />
+<script src='/js/jquery/lib.js?v=15.5'></script>
+<script src='/js/zui/min.js?t=1756300284&v=15.5'></script>
+<script src='/js/my.full.js?t=1756300284&v=15.5'></script>
+<style>.ke-toolbar .ke-outline[data-name='savetemplate'] {display: none;}
+#modulemenu .nav #dropMenu #searchResult .closed {text-decoration: none;}
+.nav #moreMenus {cursor: pointer;}
+
+#batchCreateForm .input-group, #batchEditForm .input-group,
+#batchCreateForm .input-group .form-control, #batchEditForm .input-group .form-control {position: static;}
+#batchCreateForm .input-group .colorpicker, #batchEditForm .input-group .colorpicker {z-index: 2;}
+#batchCreateForm .input-group .colorpicker.open, #batchEditForm .input-group .colorpicker.open {z-index: 5;}
+.warning2{color: #ff5d5d;font-weight: normal}
+.closed, .closed a {color: gray; text-decoration:line-through;}
+.resolved, .resolved a {color: #8EC21F; text-decoration: none;}
+.tree .closed, .tree .closed a {color: #003366; text-decoration: none;}
+.confirm0 {color: gray;}
+.confirm1 {color: green;}
+td.delayed {color: #fff; background: #e84e0f !important;}
+
+.datatable-wrapper .table-datatable .datatable-row td {height: 37px;}
+
+#createActionMenu .dropdown-menu {width: 100%;}
+
+.dropdown-menu.with-search {padding: 0; min-width: 150px; overflow: hidden; max-height: 302px;}
+.dropdown-menu > .menu-search .input-group {width: 100%;}
+.dropdown-menu > .menu-search .input-group-addon {position: absolute; right: 10px; top: 0; z-index: 10; background: none; border: none; color: #666;}
+.dropdown-menu > .menu-search .form-control {border: none !important; box-shadow: none !important; border-top: 1px solid #ddd !important;}
+.dropdown-menu > li > a {text-align: left;}
+.dropdown-list {display: block; padding: 0; max-height: 270px; overflow-y: auto;}
+.dropdown-list > li > a {display: block; padding: 3px 20px; clear: both; font-weight: normal; line-height: 1.53846154; color: #141414; white-space: nowrap;}
+.dropdown-list > li > a:hover,
+.dropdown-list > li > a:focus {color: #1a4f85; text-decoration: none; background-color: #ddd;}
+
+th.c-confirmed {text-align: center;}
+.c-severity {overflow: hidden; white-space: nowrap;}
+.c-id {text-overflow: ellipsis; white-space: nowrap;}
+
+.body-modal #mainMenu>.btn-toolbar {width: auto;}
+
+body {margin-bottom: 25px;}
+#mainMenu .btn-toolbar .btn-group .dropdown-menu .btn-active-text:hover .text {color: #fff;}
+#mainMenu .btn-toolbar .btn-group .dropdown-menu .btn-active-text:hover .text:after {border-bottom: unset;}
+.btn-group a i.icon-plus {font-size: 16px;}
+.btn-group a.btn-primary {border-right: 1px solid rgba(255,255,255,0.3);}
+.btn-group button.dropdown-toggle.btn-primary {padding:6px;}
+</style><link rel='icon' href='/favicon.ico' type='image/x-icon' />
+<link rel='shortcut icon' href='/favicon.ico' type='image/x-icon' />
+<!--[if lt IE 10]>
+<script src='/js/jquery/placeholder/min.js?v=15.5'></script>
+<![endif]-->
+</head>
+<body class=''>
+<link rel='stylesheet' href='/js/zui/picker/zui.picker.min.css?v=15.5' type='text/css' media='screen' />
+<script src='/js/zui/picker/zui.picker.min.js?v=15.5'></script>
+<style>
+.picker-single .picker-selection-remove{z-index: 1000;}
+.picker-selection-single:after, .picker-multi.picker-focus .picker-selections:before{font-family: ZentaoIcon !important; content: '\f0d7' !important;}
+</style>
+<script>
+var chooseUsersToMail = '选择要发信通知的用户...';
+if($.fn.picker)
+{
+    $(document).ready(function()
+    {
+        $(".picker-select[data-pickertype!='remote']").picker({chosenMode: true});
+        $("[data-pickertype='remote']").each(function()
+        {
+            var pickerremote = $(this).attr('data-pickerremote');
+            $(this).picker({chosenMode: true, remote: pickerremote});
+        })
+    });
+}
+</script>
+<header id='header'>
+  <div id='mainHeader'>
+    <div class='container'>
+      <div id='heading'>
+        <div class='btn-group header-btn'><a href='/index.php?m=bug&f=browse' class='btn' style='padding-top: 2px'><i class='icon icon-test'></i> 测试</a>
+</div>        <div class='btn-group header-btn' id='swapper'><button data-toggle='dropdown' type='button' class='btn' id='currentItem' title='导用例产品-开发使用'><span class='text'>导用例产品-开发使用</span> <span class='caret' style='margin-bottom: -1px'></span></button><div id='dropMenu' class='dropdown-menu search-list' data-ride='searchList' data-url='/index.php?m=product&f=ajaxGetDropMenu&objectID=831&module=bug&method=browse&extra=&from=qa'><div class="input-control search-box has-icon-left has-icon-right search-example"><input type="search" class="form-control search-input" /><label class="input-control-icon-left search-icon"><i class="icon icon-search"></i></label><a class="input-control-icon-right search-clear-btn"><i class="icon icon-close icon-sm"></i></a></div></div></div>      </div>
+      <nav id='navbar'><ul class='nav nav-default'>
+<li class=' ' data-id='index'><a href='/index.php?m=qa&f=index' >仪表盘</a>
+</li>
+<li class='divider'></li><li class=' active' data-id='bug'><a href='/index.php?m=bug&f=browse&productID=831' >Bug</a>
+</li>
+<li class=' ' data-id='testcase'><a href='/index.php?m=testcase&f=browse&productID=831' >用例</a>
+</li>
+<li class=' ' data-id='testsuite'><a href='/index.php?m=testsuite&f=browse&productID=831' >套件</a>
+</li>
+<li class='divider'></li><li class=' ' data-id='testtask'><a href='/index.php?m=testtask&f=browse&productID=831' >测试单</a>
+</li>
+<li class=' ' data-id='report'><a href='/index.php?m=testreport&f=browse&productID=831' >测试报告</a>
+</li>
+<li class='divider'></li><li class=' ' data-id='caselib'><a href='/index.php?m=caselib&f=browse&libID=0' >用例库</a>
+</li>
+</ul>
+</nav>
+      <div id='toolbar'>
+        <div id='userMenu'>
+          <ul id="userNav" class="nav nav-default">
+            <li class='dropdown dropdown-hover has-avatar'><a class='dropdown-toggle' data-toggle='dropdown'><div class='avatar has-text avatar-circle'  style='background: hsl(187, 40%, 60%);'><span>J</span></div></a><ul class='dropdown-menu pull-right'><li class="user-profile-item"><a href='/index.php?m=my&f=profile&onlybody=yes' data-width='600' class='iframe '><div class='avatar has-text avatar-circle' id="menu-avatar" style='background: hsl(187, 40%, 60%);'><span>J</span></div><div class="user-profile-name">江原臣</div><div class="user-profile-role">研发主管</div></a></li><li class="divider"></li><li><a href='/index.php?m=my&f=profile&onlybody=yes' class='iframe' data-width='600'><i class='icon icon-account'></i> 个人档案</a>
+</li><li><a href='/index.php?m=tutorial&f=start' class='iframe' data-class-name='modal-inverse' data-width='800' data-headerless='true' data-backdrop='true' data-keyboard='true'><i class='icon icon-guide'></i> 新手引导</a>
+</li><li><a href='/index.php?m=my&f=preference&onlybody=yes' class='iframe' data-width='650'><i class='icon icon-controls'></i> 个性化设置</a>
+</li><li><a href='/index.php?m=my&f=changepassword&onlybody=yes' class='iframe' data-width='600'><i class='icon icon-cog-outline'></i> 修改密码</a>
+</li><li class='divider'></li><li class='dropdown-submenu top'><a href='javascript:;'><i class='icon icon-theme'></i> 主题</a><ul class='dropdown-menu pull-left'><li class='selected'><a href='javascript:selectTheme("default");' data-value='default'>禅道蓝（默认）</a></li><li ><a href='javascript:selectTheme("blue");' data-value='blue'>青春蓝</a></li><li ><a href='javascript:selectTheme("green");' data-value='green'>叶兰绿</a></li><li ><a href='javascript:selectTheme("red");' data-value='red'>赤诚红</a></li><li ><a href='javascript:selectTheme("purple");' data-value='purple'>玉烟紫</a></li><li ><a href='javascript:selectTheme("pink");' data-value='pink'>芙蕖粉</a></li><li ><a href='javascript:selectTheme("blackberry");' data-value='blackberry'>露莓黑</a></li><li ><a href='javascript:selectTheme("classic");' data-value='classic'>经典蓝</a></li></ul></li><li class='dropdown-submenu top'><a href='javascript:;'><i class='icon icon-lang'></i> Language</a><ul class='dropdown-menu pull-left'><li class='selected'><a href='javascript:selectLang("zh-cn");'>简体</a></li><li ><a href='javascript:selectLang("zh-tw");'>繁體</a></li><li ><a href='javascript:selectLang("en");'>English</a></li></ul></li><li class='dropdown-submenu'><a data-toggle='dropdown'><i class='icon icon-help'></i> 帮助</a><ul class='dropdown-menu pull-left'><li><a href='https://www.zentao.net/book/zentaopmshelp.html?fullScreen=zentao&theme=default' class='open-in-app' id='helpLink' data-app='help'>手册</a>
+</li><li><a href='/index.php?m=misc&f=changeLog' class='iframe' data-width='800' data-headerless='true' data-backdrop='true' data-keyboard='true'>修改日志</a>
+</li></ul></li>
+<li><a href='/index.php?m=misc&f=about' class='about iframe' data-width='1050' data-headerless='true' data-backdrop='true' data-keyboard='true' data-class='modal-about'><i class='icon icon-about'></i> 关于禅道</a>
+</li><li><a href='https://api.zentao.net/goto.php?item=aiux' class='link-aiux' target='_blank'><i class='icon icon-aiux'></i> 艾体验设计</a></li><li class="divider"></li><li><a href='/index.php?m=user&f=logout'  target='_top'><i class='icon icon-exit'></i> 退出</a>
+</li></ul></li>
+            <li class='dropdown dropdown-hover' id='globalCreate'><a class='dropdown-toggle' data-toggle='dropdown'><i class='icon icon-plus-solid-circle text-secondary'></i></a><ul class='dropdown-menu pull-right create-list'><li><a href='/index.php?m=todo&f=create' ><i class='icon icon-todo'></i> 待办</a>
+</li><li class="divider"></li><li><a href='/index.php?m=bug&f=create&productID=831&branch=&extras=from=global' ><i class='icon icon-bug'></i> Bug</a>
+</li><li><a href='/index.php?m=story&f=create&productID=831&branch=0&moduleID=0&storyID=0&objectID=0&bugID=0&planID=0&todoID=0&extra=from=global' ><i class='icon icon-lightbulb'></i> 需求</a>
+</li><li><a href='/index.php?m=task&f=create&executionID=0&storyID=0&moduleID=0&taskID=0&todoID=0&extra=from=global' ><i class='icon icon-check-sign'></i> 任务</a>
+</li><li><a href='/index.php?m=testcase&f=create&productID=831&branch=&moduleID=0&from=&param=0&storyID=0&extras=from=global' ><i class='icon icon-sitemap'></i> 用例</a>
+</li><li><a href='/index.php?m=doc&f=selectLibType&objectType=&objectID=0&libID=0&onlybody=yes' class='iframe' data-width='650px'><i class='icon icon-doc'></i> 文档</a>
+</li><li class="divider"></li><li><a href='/index.php?m=execution&f=create&projectID=&executionID=0&copyExecutionID=0&planID=0&confirm=no&productID=0&extra=from=global' ><i class='icon icon-run'></i> 执行</a>
+</li><li><a href='/index.php?m=project&f=create&model=scrum&programID=0&copyProjectID=0&extra=from=global' ><i class='icon icon-project'></i> 项目</a>
+</li></ul></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+    </header>
+
+<script>
+adjustMenuWidth();
+</script>
+<main id='main'  >
+  <div class='container'>
+<style>
+#setShowModule {margin-left: 30px;}
+</style>
+<script>
+$(function()
+{
+        $('#sidebar .cell .text-center:last').append("<a href='#showModuleModal' data-toggle='modal' class='btn btn-info btn-wide'>模块设置</a><hr class='space-sm' />");
+    
+    var addSettingButton = function()
+    {
+        var $btnToolbar = $('#main .table-header .btn-toolbar:first');
+        if($btnToolbar.length > 0)
+        {
+                        var $dropdown = $('<div class="dropdown"><button id="tableCustomBtn" type="button" class="btn btn-link" data-toggle="dropdown"><i class="icon-cog-outline"></i></button></div>');
+            var $dropmenu = $('<ul class="dropdown-menu pull-right"></ul>');
+            if(typeof(storyType) != 'undefined' && storyType == 'requirement')
+            {
+                $dropmenu.append("<li><a href='/index.php?m=datatable&f=ajaxCustom&id=bug&method=browse&extra=requirement' data-toggle='modal' data-type='ajax'>自定义列</a></li>");
+            }
+            else
+            {
+                $dropmenu.append("<li><a href='/index.php?m=datatable&f=ajaxCustom&id=bug&method=browse' data-toggle='modal' data-type='ajax'>自定义列</a></li>");
+
+            }
+            $dropmenu.append("<li><a href='javascript:saveDatatableConfig(\"mode\", \"datatable\", true);' id='switchToDatatable'>切换到高级表格</a></li>");
+            $dropdown.append($dropmenu).appendTo($btnToolbar);
+        }
+    };
+    $('#main .main-table').on('tableReload', addSettingButton);
+    addSettingButton();
+
+    $('#setShowModule').click(function()
+    {
+        if('jiangyuanchen' == 'guest') return;
+        datatableId   = 'bugBrowse';
+        var value     = $('#showModuleModal input[name="showModule"]:checked').val();
+        var allModule = $('#showModuleModal input[name="showAllModule"]:checked').val();
+        if(typeof allModule === 'undefined') allModule = false;
+        $.ajax(
+        {
+            type: "POST",
+            dataType: 'json',
+            data:
+            {
+                target: datatableId,
+                name: 'showModule',
+                value: value,
+                allModule: allModule,
+            },
+            success:function(){window.location.reload();},
+            url: '/index.php?m=datatable&f=ajaxSave'
+        });
+    });
+
+    window.saveDatatableConfig = function(name, value, reload, global)
+    {
+        if('jiangyuanchen' == 'guest') return;
+        var datatableId = 'bugBrowse';
+        if(typeof value === 'object') value = JSON.stringify(value);
+        if(typeof global === 'undefined') global = 0;
+        $.ajax(
+        {
+            type: "POST",
+            dataType: 'json',
+            data: {target: datatableId, name: name, value: value, global: global},
+            success:function(e){if(reload) window.location.reload();},
+            url: '/index.php?m=datatable&f=ajaxSave'
+        });
+        $.get(createLink('score', 'ajax', "method=switchToDataTable"));
+    };
+});
+</script>
+
+<div class="modal fade" id="showModuleModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog w-600px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><i class="icon icon-close"></i></button>
+        <h4 class="modal-title"><i class="icon-cog-outline"></i> 模块设置</h4>
+      </div>
+      <div class="modal-body">
+        <form class='form-condensed' method='post' target='hiddenwin' action='/index.php?m=datatable&f=ajaxSave'>
+          <table class='table table-form'>
+            <tr>
+              <td class='w-150px'>列表页是否显示模块名</td>
+              <td><label class='radio-inline'><input type='radio' name='showModule' value='0'  checked ='checked' id='showModule0' /> 不显示</label><label class='radio-inline'><input type='radio' name='showModule' value='base'  id='showModulebase' /> 只显示一级模块</label><label class='radio-inline'><input type='radio' name='showModule' value='end'  checked ='checked' id='showModuleend' /> 只显示最后一级模块</label></td>
+            </tr>
+                        <tr>
+              <td colspan='2' class='text-center'><button type='button' id='setShowModule' class='btn btn-primary'>保存</button></td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>browseType = "unclosed";</script>
+<script>moduleID = 0;</script>
+<script>bugBrowseType = "unclosed";</script>
+<script>flow = "full";</script>
+<script>productID = 831;</script>
+<script>branch = 0;</script>
+<div id="mainMenu" class="clearfix">
+  <div id="sidebarHeader">
+    <div class="title">
+      所有模块    </div>
+  </div>
+  <div class="btn-toolbar pull-left">
+    <a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=all' class='btn btn-link '><span class='text'>所有</span></a>
+<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=unclosed' class='btn btn-link btn-active-text'><span class='text'>未关闭</span> <span class='label label-light label-badge'>0</span></a>
+<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=openedbyme' class='btn btn-link '><span class='text'>由我创建</span></a>
+<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=assigntome' class='btn btn-link '><span class='text'>指派给我</span></a>
+<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=resolvedbyme' class='btn btn-link '><span class='text'>由我解决</span></a>
+<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=toclosed' class='btn btn-link '><span class='text'>待关闭</span></a>
+<a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=unresolved' class='btn btn-link '><span class='text'>未解决</span></a>
+<div class='btn-group'><a href='javascript:;' data-toggle='dropdown' class='btn btn-link '>更多 <span class='caret'></span></a><ul class='dropdown-menu'><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=unconfirmed' class='btn btn-link '><span class='text'>未确认</span></a>
+</li><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=assigntonull' class='btn btn-link '><span class='text'>未指派</span></a>
+</li><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=longlifebugs' class='btn btn-link '><span class='text'>久未处理</span></a>
+</li><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=postponedbugs' class='btn btn-link '><span class='text'>被延期</span></a>
+</li><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=overduebugs' class='btn btn-link '><span class='text'>过期Bug</span></a>
+</li><li><a href='/index.php?m=bug&f=browse&productid=831&branch=0&browseType=needconfirm' class='btn btn-link '><span class='text'>产品需求变动</span></a>
+</li></ul></div>    <a class="btn btn-link querybox-toggle" id='bysearchTab'><i class="icon icon-search muted"></i> 搜索</a>
+  </div>
+    <div class="btn-toolbar pull-right">
+    <a href='/index.php?m=bug&f=report&productID=831&browseType=unclosed&branchID=0&moduleID=0' class='btn btn-link '  data-app="qa"><i class='icon-common-report icon-bar-chart muted'></i> <span class='text'>报表</span></a>
+    <div class='btn-group'>
+      <button type='button' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>
+        <i class="icon icon-export muted"></i> <span class="text"> 导出</span> <span class="caret"></span></button>
+      </button>
+      <ul class='dropdown-menu' id='exportActionMenu'>
+        <li ><a href='/index.php?m=bug&f=export&productID=831&orderBy=id_desc&browseType=unclosed' class='export'>导出数据</a>
+</li>      </ul>
+    </div>
+                <div class='btn-group dropdown'>
+      <a href='/index.php?m=bug&f=create&productID=831&branch=0&extra=moduleID=0' class='btn btn-primary create-bug-btn '><i class='icon-plus'></i> 提Bug</a>
+            <button type='button' class='btn btn-primary dropdown-toggle' data-toggle='dropdown'><span class='caret'></span></button>
+      <ul class='dropdown-menu'>
+        <li><a href='/index.php?m=bug&f=create&productID=831&branch=0&extra=moduleID=0' >提Bug</a>
+</li>
+        <li><a href='/index.php?m=bug&f=batchCreate&productID=831&branch=0&executionID=0&moduleID=0' >批量提Bug</a>
+</li>
+      </ul>
+          </div>
+          </div>
+  </div>
+<div id="mainContent" class="main-row fade">
+  <div class="side-col" id="sidebar">
+    <div class="sidebar-toggle"><i class="icon icon-angle-left"></i></div>
+    <div class="cell">
+            <hr class="space">
+      <div class="text-center text-muted"><div>您现在还没有模块信息</div><div>请维护测试模块</div></div>
+      <hr class="space">
+                  <div class="text-center">
+        <a href='/index.php?m=tree&f=browse&productID=831&view=bug&currentModuleID=0&branch=0&from=qa' class='btn btn-info btn-wide' data-app="qa">维护模块</a>
+        <hr class="space-sm" />
+      </div>
+    </div>
+  </div>
+  <div class="main-col">
+    <div class="cell" id="queryBox" data-module='bug'></div>
+        <div class="table-empty-tip">
+      <p>
+        <span class="text-muted">暂时没有Bug。</span>
+                <a href='/index.php?m=bug&f=create&productID=831&branch=0&extra=moduleID=0' class='btn btn-info'><i class='icon icon-plus'></i> 提Bug</a>
+              </p>
+    </div>
+      </div>
+</div>
+<script>
+$('#module' + moduleID).closest('li').addClass('active');
+var branchID = $.cookie('bugBranch');
+$('#branch' + branchID).closest('li').addClass('active');
+</script>
+</div><script>
+$.initSidebar();
+</script>
+
+<iframe frameborder='0' name='hiddenwin' id='hiddenwin' scrolling='no' class='debugwin hidden'></iframe>
+</main><div id="noticeBox"></div>
+<script>
+/* Alert got messages. */
+needPing = false;
+$(function()
+{
+    var windowBlur = false;
+    if(window.Notification)
+    {
+        window.onblur  = function(){windowBlur = true;}
+        window.onfocus = function(){windowBlur = false;}
+    }
+    setInterval(function()
+    {
+        $.get(createLink('message', 'ajaxGetMessage', "windowBlur=" + (windowBlur ? '1' : '0')), function(data)
+        {
+            if(!windowBlur)
+            {
+                $('#noticeBox').append(data);
+                adjustNoticePosition();
+            }
+            else
+            {
+                if(data)
+                {
+                    if(typeof data == 'string') data = $.parseJSON(data);
+                    if(typeof data.message == 'string') notifyMessage(data);
+                }
+            }
+        });
+    }, 300000);
+})
+
+</script>
+
+<script>$(function()
+{
+    var page = window.page || '';
+    var flow = window.flow;
+    if(typeof(systemMode) == undefined) var systemMode = '';
+
+    $('#subNavbar a[data-toggle=dropdown]').parent().addClass('dropdown dropdown-hover');
+
+    if(page == 'create' || page == 'edit' || page == 'assignedto' || page == 'confirmbug')
+    {
+        oldProductID = $('#product').val();
+    }
+
+    if(window.flow != 'full')
+    {
+        $('.querybox-toggle').click(function()
+        {
+            $(this).parent().toggleClass('active');
+        });
+    }
+});
+/**
+ * Load all fields.
+ *
+ * @param  int $productID
+ * @access public
+ * @return void
+ */
+function loadAll(productID)
+{
+    if(page == 'create')
+    {
+        loadExecutionTeamMembers(productID);
+        setAssignedTo();
+    }
+
+    if(typeof(changeProductConfirmed) != 'undefined' && !changeProductConfirmed)
+    {
+        firstChoice = confirm(confirmChangeProduct);
+        changeProductConfirmed = true;    // Only notice the user one time.
+
+        if(!firstChoice)
+        {
+            $('#product').val(oldProductID);//Revert old product id if confirm is no.
+            $('#product').trigger("chosen:updated");
+            $('#product').chosen();
+            return true;
+        }
+
+        loadAll(productID);
+    }
+    else
+    {
+        $('#taskIdBox').innerHTML = '<select id="task"></select>';  // Reset the task.
+        $('#task').chosen();
+        loadProductBranches(productID)
+        loadProductModules(productID);
+        loadProductProjects(productID);
+        loadProductBuilds(productID);
+        loadProductplans(productID);
+        loadProductStories(productID);
+        //loadTestTasks(productID);
+    }
+}
+
+/**
+ * Load by branch.
+ *
+ * @access public
+ * @return void
+ */
+function loadBranch()
+{
+    $('#taskIdBox').innerHTML = '<select id="task"></select>';  // Reset the task.
+    $('#task').chosen();
+    productID = $('#product').val();
+    loadProductModules(productID);
+    loadProductProjects(productID);
+    loadProductBuilds(productID);
+    loadProductplans(productID);
+    loadProductStories(productID);
+}
+
+/**
+  *Load all builds of one execution or product.
+  *
+  * @param  object $object
+  * @access public
+  * @return void
+  */
+function loadAllBuilds(object)
+{
+    if(page == 'resolve')
+    {
+        oldResolvedBuild = $('#resolvedBuild').val() ? $('#resolvedBuild').val() : 0;
+        link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=resolvedBuild&build=' + oldResolvedBuild + '&branch=0&index=0&type=all');
+        $('#resolvedBuildBox').load(link, function(){$(this).find('select').chosen()});
+    }
+    else
+    {
+        productID   = $('#product').val();
+        executionID = $('#execution').val();
+
+        var buildBox = '';
+        if(page == 'edit') buildBox = $(object).closest('.input-group').attr('id');
+
+        if(executionID)
+        {
+            loadAllExecutionBuilds(executionID, productID, buildBox);
+        }
+        else
+        {
+            loadAllProductBuilds(productID, buildBox);
+        }
+    }
+}
+
+/**
+  * Load all builds of the execution.
+  *
+  * @param  int    $executionID
+  * @param  int    $productID
+  * @param  string $buildBox
+  * @access public
+  * @return void
+  */
+function loadAllExecutionBuilds(executionID, productID, buildBox)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(page == 'create')
+    {
+        oldOpenedBuild = $('#openedBuild').val() ? $('#openedBuild').val() : 0;
+        link = createLink('build', 'ajaxGetExecutionBuilds', 'executionID=' + executionID + '&productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch + '&index=0&needCreate=true&type=all');
+        $.get(link, function(data)
+        {
+            if(!data) data = '<select id="openedBuild" name="openedBuild" class="form-control" multiple=multiple></select>';
+            $('#openedBuild').replaceWith(data);
+            $('#openedBuild_chosen').remove();
+            $('#openedBuild').next('.picker').remove();
+            $("#openedBuild").chosen();
+            notice();
+        })
+    }
+    if(page == 'edit')
+    {
+        if(buildBox == 'openedBuildBox')
+        {
+            link = createLink('build', 'ajaxGetExecutionBuilds', 'executionID=' + executionID + '&productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch + '&index=0&needCreate=true&type=all');
+            $('#openedBuildBox').load(link, function(){$(this).find('select').chosen()});
+        }
+        if(buildBox == 'resolvedBuildBox')
+        {
+            link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=resolvedBuild&build=' + oldResolvedBuild + '&branch=' + branch + '&index=0&type=all');
+            $('#resolvedBuildBox').load(link, function(){$(this).find('select').chosen()});
+        }
+    }
+}
+
+/**
+  * Load all builds of the product.
+  *
+  * @param  int    $productID
+  * @param  string $buildBox
+  * @access public
+  * @return void
+  */
+function loadAllProductBuilds(productID, buildBox)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(page == 'create')
+    {
+        link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch + '&index=0&type=all');
+        $.get(link, function(data)
+        {
+            if(!data) data = '<select id="openedBuild" name="openedBuild" class="form-control" multiple=multiple></select>';
+            $('#openedBuild').replaceWith(data);
+            $('#openedBuild_chosen').remove();
+            $('#openedBuild').next('.picker').remove();
+            $("#openedBuild").chosen();
+            notice();
+        })
+    }
+    if(page == 'edit')
+    {
+        if(buildBox == 'openedBuildBox')
+        {
+            link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch + '&index=0&type=all');
+            $('#openedBuildBox').load(link, function(){$(this).find('select').chosen()});
+        }
+        if(buildBox == 'resolvedBuildBox')
+        {
+            link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=resolvedBuild&build=' + oldResolvedBuild + '&branch' + branch + '&index=0&type=all');
+            $('#resolvedBuildBox').load(link, function(){$(this).find('select').chosen()});
+        }
+    }
+}
+
+/**
+ * Load product's modules.
+ *
+ * @param  int    $productID
+ * @access public
+ * @return void
+ */
+function loadProductModules(productID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(typeof(moduleID) == 'undefined') moduleID = 0;
+    link = createLink('tree', 'ajaxGetOptionMenu', 'productID=' + productID + '&viewtype=bug&branch=' + branch + '&rootModuleID=0&returnType=html&fieldID=&needManage=true&extra=&currentModuleID=' + moduleID);
+    $('#moduleIdBox').load(link, function()
+    {
+        $(this).find('select').chosen()
+        if(typeof(bugModule) == 'string') $('#moduleIdBox').prepend("<span class='input-group-addon' style='border-left-width: 1px;'>" + bugModule + "</span>");
+    });
+}
+/**
+ * Load product stories
+ *
+ * @param  int    $productID
+ * @access public
+ * @return void
+ */
+function loadProductStories(productID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(typeof(oldStoryID) == 'undefined') oldStoryID = 0;
+    link = createLink('story', 'ajaxGetProductStories', 'productID=' + productID + '&branch=' + branch + '&moduleId=0&storyID=' + oldStoryID);
+    $('#storyIdBox').load(link, function(){$('#story').chosen();});
+}
+
+/**
+ * wandonghao
+ * @param attributionID
+ */
+function loadAttribution(attributionID,attribution2ID){
+    if(typeof(attributionID) == 'undefined') attributionID = '';
+    if(typeof(attribution2ID) == 'undefined') attribution2ID = '';
+    link = createLink('bug', 'ajaxGetAttributions', 'attributionID=' + attributionID+'&attribution2ID=' + attribution2ID);
+    $('#attributionBox').load(link, function(){
+        $('#attribution2').chosen();
+    });
+    if($('#attributionTeamBox')){
+        getAttributionTeamlink = createLink('bug', 'ajaxGetAttributionTeams', 'attributionID=' + attributionID+'&attribution2ID=' + attribution2ID);
+        $('#attributionTeamBox').load(getAttributionTeamlink, function(){
+            $('#attributionTeam').chosen();
+        });
+    }
+}
+/**
+ * Load projects of product.
+ *
+ * @param  int    $productID
+ * @access public
+ * @return void
+ */
+function loadProductProjects(productID)
+{
+    if(systemMode == 'classic')
+    {
+        var projectID = $('#execution').find("option:selected").val();
+        loadProductExecutions(productID, projectID);
+        return true;
+    }
+
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+
+    link = createLink('product', 'ajaxGetProjects', 'productID=' + productID + '&branch=' + branch + '&projectID=' + oldProjectID);
+    $('#projectBox').load(link, function()
+    {
+        $(this).find('select').chosen();
+        var projectID = $('#project').find("option:selected").val();
+        loadProductExecutions(productID, projectID);
+    });
+}
+
+/**
+ * Load executions of product.
+ *
+ * @param  int    $productID
+ * @param  int    $projectID
+ * @access public
+ * @return void
+ */
+function loadProductExecutions(productID, projectID = 0)
+{
+    required = $('#execution_chosen').hasClass('required');
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+
+    link = createLink('product', 'ajaxGetExecutions', 'productID=' + productID + '&projectID=' + projectID + '&branch=' + branch);
+    $('#executionIdBox').load(link, function()
+    {
+        $(this).find('select').chosen();
+        if(typeof(bugExecution) == 'string' && systemMode != 'classic') $('#executionIdBox').prepend("<span class='input-group-addon' style='border-left-width: 0px;'>" + bugExecution + "</span>");
+        if(required) $(this).addClass('required');
+    });
+}
+
+/**
+ * Load product plans.
+ *
+ * @param  productID $productID
+ * @access public
+ * @return void
+ */
+function loadProductplans(productID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    link = createLink('productplan', 'ajaxGetProductplans', 'productID=' + productID + '&branch=' + branch);
+    $('#planIdBox').load(link, function(){$(this).find('select').chosen()});
+}
+/**
+ * Load product builds.
+ *
+ * @param  productID $productID
+ * @access public
+ * @return void
+ */
+function loadProductBuilds(productID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(typeof(oldOpenedBuild) == 'undefined') oldOpenedBuild = 0;
+    link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch);
+
+    if(page == 'create')
+    {
+        $.get(link, function(data)
+        {
+            if(!data) data = '<select id="openedBuild" name="openedBuild" class="form-control" multiple=multiple></select>';
+            $('#openedBuild').replaceWith(data);
+            $('#openedBuild_chosen').remove();
+            $('#openedBuild').next('.picker').remove();
+            $("#openedBuild").chosen();
+            notice();
+        })
+    }
+    else
+    {
+        $('#openedBuildBox').load(link, function(){$(this).find('select').chosen()});
+        link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=resolvedBuild&build=' + oldResolvedBuild + '&branch=' + branch);
+        $('#resolvedBuildBox').load(link, function(){$(this).find('select').chosen()});
+    }
+}
+
+/**
+ * Load execution related bugs and tasks.
+ *
+ * @param  int    $executionID
+ * @access public
+ * @return void
+ */
+function loadExecutionRelated(executionID)
+{
+    executionID = parseInt(executionID);
+    if(executionID)
+    {
+        loadExecutionTasks(executionID);
+        loadExecutionStories(executionID);
+        loadExecutionBuilds(executionID);
+        loadAssignedTo(executionID);
+        loadTestTasks($('#product').val(), executionID);
+    }
+    else
+    {
+        $('#taskIdBox').innerHTML = '<select id="task"></select>';  // Reset the task.
+        loadProductStories($('#product').val());
+        loadProductBuilds($('#product').val());
+        loadTestTasks($('#product').val());
+        loadProjectTeamMembers($('#project').val());
+    }
+}
+
+/**
+ * Load execution tasks.
+ *
+ * @param  executionID $executionID
+ * @access public
+ * @return void
+ */
+function loadExecutionTasks(executionID)
+{
+    link = createLink('task', 'ajaxGetExecutionTasks', 'executionID=' + executionID + '&taskID=' + oldTaskID);
+    $.post(link, function(data)
+    {
+        if(!data) data = '<select id="task" name="task" class="form-control"></select>';
+        $('#task').replaceWith(data);
+        $('#task_chosen').remove();
+        $('#task').next('.picker').remove();
+        $("#task").chosen();
+    })
+}
+
+/**
+ * Load execution stories.
+ *
+ * @param  executionID $executionID
+ * @access public
+ * @return void
+ */
+function loadExecutionStories(executionID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    if(typeof(oldStoryID) == 'undefined') oldStoryID = 0;
+    link = createLink('story', 'ajaxGetExecutionStories', 'executionID=' + executionID + '&productID=' + $('#product').val() + '&branch=' + branch + '&moduleID=0&storyID=' + oldStoryID);
+    $('#storyIdBox').load(link, function(){$('#story').chosen();});
+}
+
+/**
+ * Load builds of a execution.
+ *
+ * @param  int      $executionID
+ * @access public
+ * @return void
+ */
+function loadExecutionBuilds(executionID)
+{
+    branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    productID = $('#product').val();
+    oldOpenedBuild = $('#openedBuild').val() ? $('#openedBuild').val() : 0;
+
+    if(page == 'create')
+    {
+        link = createLink('build', 'ajaxGetExecutionBuilds', 'executionID=' + executionID + '&productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + "&branch=" + branch + "&index=0&needCreate=true");
+        $.get(link, function(data)
+        {
+            if(!data) data = '<select id="openedBuild" name="openedBuild" class="form-control" multiple=multiple></select>';
+            $('#openedBuild').replaceWith(data);
+            $('#openedBuild').val(oldOpenedBuild);
+            $('#openedBuild_chosen').remove();
+            $('#openedBuild').next('.picker').remove();
+            $("#openedBuild").chosen();
+            notice();
+        })
+    }
+    else
+    {
+        link = createLink('build', 'ajaxGetExecutionBuilds', 'executionID=' + executionID + '&productID=' + productID + '&varName=openedBuild&build=' + oldOpenedBuild + '&branch=' + branch);
+        $('#openedBuildBox').load(link, function(){$(this).find('select').val(oldOpenedBuild).chosen()});
+
+        oldResolvedBuild = $('#resolvedBuild').val() ? $('#resolvedBuild').val() : 0;
+        link = createLink('build', 'ajaxGetProductBuilds', 'productID=' + productID + '&varName=resolvedBuild&build=' + oldResolvedBuild + '&branch=' + branch);
+        $('#resolvedBuildBox').load(link, function(){$(this).find('select').val(oldResolvedBuild).chosen()});
+    }
+}
+
+/**
+ * Load project members.
+ *
+ * @param  projectID $projectID
+ * @access public
+ * @return void
+ */
+function loadProjectTeamMembers(projectID)
+{
+    link = createLink('bug', 'ajaxGetProjectTeamMembers', 'projectID=' + projectID);
+    $.get(link, function(data)
+    {
+        if(!data) data = '<select id="assignedTo" name="assignedTo" class="form-control"></select>';
+        $('#assignedTo').replaceWith(data);
+        $('#assignedTo_chosen').remove();
+        $("#assignedTo").chosen();
+    });
+}
+
+/**
+ * Set story field.
+ *
+ * @param  moduleID $moduleID
+ * @param  productID $productID
+ * @param  storyID $storyID
+ * @access public
+ * @return void
+ */
+function setStories(moduleID, productID, storyID)
+{
+    var branch = $('#branch').val();
+    if(typeof(branch) == 'undefined') branch = 0;
+    link = createLink('story', 'ajaxGetProductStories', 'productID=' + productID + '&branch=' + branch + '&moduleID=' + moduleID + '&storyID=' + storyID);
+    $.get(link, function(stories)
+    {
+        if(!stories) stories = '<select id="story" name="story" class="form-control"></select>';
+        $('#story').replaceWith(stories);
+        $('#story_chosen').remove();
+        $('#story').next('.picker').remove();
+        $("#story").chosen();
+    });
+}
+
+/**
+ * Load product branches.
+ *
+ * @param  int $productID
+ * @access public
+ * @return void
+ */
+function loadProductBranches(productID)
+{
+    $('#branch').remove();
+    $('#branch_chosen').remove();
+    $('#branch').next('.picker').remove();
+    $.get(createLink('branch', 'ajaxGetBranches', "productID=" + productID), function(data)
+    {
+        if(data)
+        {
+            $('#product').closest('.input-group').append(data);
+            $('#branch').css('width', page == 'create' ? '120px' : '65px');
+            $('#branch').chosen();
+        }
+    })
+}
+
+
+var oldAssignedToTitle = $("#assignedTo").find("option:selected").text();
+var oldAssignedTo      = $("#assignedTo").find("option:selected").val();
+
+/**
+ * Load team members of the execution as assignedTo list.
+ *
+ * @param  int     $executionID
+ * @access public
+ * @return void
+ */
+function loadAssignedTo(executionID, selectedUser)
+{
+    selectedUser = (typeof(selectedUser) == 'undefined') ? '' : $('#assignedTo').val();
+    link = createLink('bug', 'ajaxLoadAssignedTo', 'executionID=' + executionID + '&selectedUser=' + selectedUser);
+    $.get(link, function(data)
+    {
+        var defaultOption = '<option title="' + oldAssignedToTitle + '" value="' + oldAssignedTo + '" selected="selected">' + oldAssignedToTitle + '</option>';
+        var defaultAssignedTo = $('#assignedTo').val();
+
+        $('#assignedTo_chosen').remove();
+        $('#assignedTo').next('.picker').remove();
+        $('#assignedTo').replaceWith(data);
+
+        if(defaultAssignedTo !== oldAssignedTo && selectedUser == '')
+        {
+            if($('#assignedTo option[value="' + oldAssignedTo + '"]').length > 0) $('#assignedTo option[value="' + oldAssignedTo + '"]').remove();
+            $('#assignedTo').append(defaultOption);
+        }
+        $('#assignedTo').chosen();
+    });
+}
+
+var oldTestTaskTitle = $("#testtask").find("option:selected").text();
+var oldTestTask      = $("#testtask").find("option:selected").val();
+
+/**
+ * Load test tasks.
+ *
+ * @param  int $productID
+ * @param  int $executionID
+ * @access public
+ * @return void
+ */
+function loadTestTasks(productID, executionID)
+{
+    if(typeof(executionID) == 'undefined') executionID = 0;
+    link = createLink('testtask', 'ajaxGetTestTasks', 'productID=' + productID + '&executionID=' + executionID);
+    $.get(link, function(data)
+    {
+        var defaultOption = '<option title="' + oldTestTaskTitle + '" value="' + oldTestTask + '" selected="selected">' + oldTestTaskTitle + '</option>';
+        $('#testtaskBox').html(data);
+        $('#testtask').append(defaultOption);
+        $('#testtask').chosen();
+    });
+}
+
+/**
+ * notice for create build.
+ *
+ * @access public
+ * @return void
+ */
+function notice()
+{
+    $('#buildBoxActions').empty().hide();
+    if($('#openedBuild').find('option').length <= 1)
+    {
+        var html = '';
+        if($('#execution').length == 0 || $('#execution').val() == 0)
+        {
+            var branch = $('#branch').val();
+            if(typeof(branch) == 'undefined') branch = 0;
+            var link = createLink('release', 'create', 'productID=' + $('#product').val() + '&branch=' + branch);
+            if(config.onlybody != 'yes') link += config.requestType == 'GET' ? '&onlybody=yes' : '?onlybody=yes';
+            html += '<a href="' + link + '" data-toggle="modal" data-type="iframe" style="padding-right:5px">' + createBuild + '</a> ';
+            html += '<a href="javascript:loadProductBuilds(' + $('#product').val() + ')">' + refresh + '</a>';
+        }
+        else
+        {
+            executionID = $('#execution').val();
+            productID   = $('#product').val();
+            projectID   = $('#project').val();
+            link = createLink('build', 'create','executionID=' + executionID + '&productID=' + productID + '&projectID=' + projectID);
+            link += config.requestType == 'GET' ? '&onlybody=yes' : '?onlybody=yes';
+            html += '<a href="' + link + '" data-toggle="modal" data-type="iframe" style="padding-right:5px">' + createBuild + '</a> ';
+            html += '<a href="javascript:loadExecutionBuilds(' + executionID + ')">' + refresh + '</a>';
+        }
+        var $bba = $('#buildBoxActions');
+        if($bba.length)
+        {
+            $bba.html(html);
+            $bba.show();
+        }
+        else
+        {
+            if($('#buildBox').closest('tr').find('td').size() > 1)
+            {
+                $('#buildBox').closest('td').next().attr('id', 'buildBoxActions');
+                $('#buildBox').closest('td').next().html(html);
+            }
+            else
+            {
+                html = "<td id='buildBoxActions'>" + html + '</td>';
+                $('#buildBox').closest('td').after(html);
+            }
+        }
+    }
+}
+
+
+function changiscommon(){
+    $(".qualityer").hide();
+    var iscommon = $("#iscommon").val();
+    if (1 == iscommon){
+        $(".qualityer").show();
+    }else{
+        $("#qualityer").val('');
+        $("#qualityaffect").val('');
+    }
+}
+$(function()
+{
+    if($('#bugList thead th.c-title').width() < 150) $('#bugList thead th.c-title').width(150);
+});
+
+</script>
+<link rel='stylesheet' href='/theme/default/floating-window.css?v=15.5' type='text/css' media='screen' />
+<script src='/js/misc/floatingWindow.js?v=15.5'></script>
+</body>
+</html>

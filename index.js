@@ -79,7 +79,7 @@ export class RDMSMCPServer {
       tools: [
         {
           name: 'rdms_login',
-          description: 'Login to RDMS system',
+          description: 'Login to RDMS system. Once logged in successfully, the session cookies will be automatically cached and reused for all subsequent API calls. You only need to call this once per session - the system will automatically handle authentication for future requests using the cached cookies. If a session expires, the system will attempt auto-login using stored credentials.',
           inputSchema: {
             type: 'object',
             properties: {
@@ -92,54 +92,24 @@ export class RDMSMCPServer {
         },
         {
           name: 'rdms_get_bug',
-          description: 'Get bug details by ID with image extraction and analysis',
+          description: 'Get bug details by ID with image extraction. Returns bug information including image URLs but NOT image content. If you need to analyze image content, use the rdms_download_image tool with the returned image URLs.',
           inputSchema: {
             type: 'object',
             properties: {
-              bugId: { type: 'string', description: 'Bug ID' },
-              analyzeImages: { type: 'boolean', description: 'Whether to analyze images with AI vision', default: true }
+              bugId: { type: 'string', description: 'Bug ID' }
             },
             required: ['bugId']
           }
         },
         {
           name: 'rdms_get_market_defect',
-          description: 'Get market defect details by ID with image extraction and analysis',
+          description: 'Get market defect details by ID with image extraction. Returns defect information including image URLs but NOT image content. If you need to analyze image content, use the rdms_download_image tool with the returned image URLs.',
           inputSchema: {
             type: 'object',
             properties: {
-              defectId: { type: 'string', description: 'Market defect ID' },
-              analyzeImages: { type: 'boolean', description: 'Whether to analyze images with AI vision', default: true }
+              defectId: { type: 'string', description: 'Market defect ID' }
             },
             required: ['defectId']
-          }
-        },
-        {
-          name: 'rdms_search_bugs',
-          description: 'Search bugs with enhanced filters',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              query: { type: 'string', description: 'Search query' },
-              assignedTo: { type: 'string', description: 'Assigned to user' },
-              status: { type: 'string', description: 'Bug status' },
-              severity: { type: 'string', description: 'Bug severity' },
-              execution: { type: 'string', description: 'Execution/iteration version' },
-              limit: { type: 'number', description: 'Max results', default: 20 }
-            }
-          }
-        },
-        {
-          name: 'rdms_search_market_defects',
-          description: 'Search market defects',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              query: { type: 'string', description: 'Search query' },
-              assignedTo: { type: 'string', description: 'Assigned to user' },
-              status: { type: 'string', description: 'Defect status' },
-              limit: { type: 'number', description: 'Max results', default: 20 }
-            }
           }
         },
         {
@@ -154,16 +124,6 @@ export class RDMSMCPServer {
           }
         },
         {
-          name: 'rdms_get_pending_bugs',
-          description: 'Get pending bugs assigned to current user',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              limit: { type: 'number', description: 'Max results', default: 20 }
-            }
-          }
-        },
-        {
           name: 'rdms_get_market_defects',
           description: 'Get market defects assigned to current user',
           inputSchema: {
@@ -171,14 +131,6 @@ export class RDMSMCPServer {
             properties: {
               limit: { type: 'number', description: 'Max results', default: 20 }
             }
-          }
-        },
-        {
-          name: 'rdms_get_work_dashboard',
-          description: 'Get work dashboard information',
-          inputSchema: {
-            type: 'object',
-            properties: {}
           }
         },
         {
@@ -205,20 +157,13 @@ export class RDMSMCPServer {
           case 'rdms_login':
             return { content: [{ type: 'text', text: JSON.stringify(await this.login(args.baseUrl, args.username, args.password)) }] };
           case 'rdms_get_bug':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.getBug(args.bugId, args.analyzeImages)) }] };
+            return { content: [{ type: 'text', text: JSON.stringify(await this.getBug(args.bugId)) }] };
           case 'rdms_get_market_defect':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.getMarketDefect(args.defectId, args.analyzeImages)) }] };
-          case 'rdms_search_bugs':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.searchBugs(args.query, args)) }] };
-          case 'rdms_search_market_defects':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.searchMarketDefects(args.query, args)) }] };
+            return { content: [{ type: 'text', text: JSON.stringify(await this.getMarketDefect(args.defectId)) }] };
           case 'rdms_get_my_bugs':
-          case 'rdms_get_pending_bugs':
             return { content: [{ type: 'text', text: JSON.stringify(await this.getMyBugs(args.status, args.limit)) }] };
           case 'rdms_get_market_defects':
             return { content: [{ type: 'text', text: JSON.stringify(await this.getMarketDefects(args.limit)) }] };
-          case 'rdms_get_work_dashboard':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.getWorkDashboard()) }] };
           case 'rdms_download_image':
             return await this.downloadImage(args.imageUrl, args.filename, args.analyze);
           default:
@@ -289,7 +234,7 @@ export class RDMSMCPServer {
     }
   }
 
-  async getBug(bugId, analyzeImages = true) {
+  async getBug(bugId) {
     await this.ensureLoggedIn();
     try {
       const response = await this.client.get(`${this.baseUrl}/index.php?m=bug&f=view&bugID=${bugId}`);
@@ -308,8 +253,7 @@ export class RDMSMCPServer {
         status: '', priority: '', severity: '', assignedTo: '', reporter: '',
         product: '', project: '', module: '', version: '', os: '', browser: '',
         steps: '', description: '', keywords: '', created: '', updated: '',
-        images: [],
-        imageAnalysis: []
+        images: []
       };
 
       // Extract images
@@ -363,18 +307,13 @@ export class RDMSMCPServer {
         });
       });
 
-      // Analyze images if requested
-      if (analyzeImages && bugInfo.images.length > 0) {
-        bugInfo.imageAnalysis = await this.analyzeImages(bugInfo.images);
-      }
-
       return bugInfo;
     } catch (error) {
       return { error: error.message };
     }
   }
 
-  async getMarketDefect(defectId, analyzeImages = true) {
+  async getMarketDefect(defectId) {
     await this.ensureLoggedIn();
     try {
       const response = await this.client.get(`${this.baseUrl}/index.php?m=bugmarket&f=view&bugID=${defectId}`);
@@ -385,8 +324,7 @@ export class RDMSMCPServer {
         title: $('.page-title').text().trim() || $('title').text().trim(),
         status: '', priority: '', severity: '', assignedTo: '', reporter: '',
         product: '', project: '', module: '', version: '', created: '', updated: '',
-        images: [],
-        imageAnalysis: []
+        images: []
       };
 
       // Extract images
@@ -413,11 +351,6 @@ export class RDMSMCPServer {
         if (label.includes('所属项目') || label.includes('Project')) defectInfo.project = value;
         if (label.includes('所属模块') || label.includes('Module')) defectInfo.module = value;
       });
-
-      // Analyze images if requested
-      if (analyzeImages && defectInfo.images.length > 0) {
-        defectInfo.imageAnalysis = await this.analyzeImages(defectInfo.images);
-      }
 
       return defectInfo;
     } catch (error) {
@@ -535,48 +468,7 @@ export class RDMSMCPServer {
     }
   }
 
-  async searchBugs(query = '', options = {}) {
-    await this.ensureLoggedIn();
-    try {
-      let searchUrl = `${this.baseUrl}/index.php?m=bug&f=browse`;
-      const params = new URLSearchParams();
-      
-      if (query) params.append('param', query);
-      if (options.assignedTo) params.append('assignedTo', options.assignedTo);
-      if (options.status) params.append('browseType', options.status);
-      if (options.execution) params.append('execution', options.execution);
-      
-      if (params.toString()) {
-        searchUrl += '&' + params.toString();
-      }
 
-      const response = await this.client.get(searchUrl);
-      return this.parseBugList(response.data, options.limit || 20, 'BUG搜索');
-    } catch (error) {
-      return { success: false, error: error.message, bugs: [] };
-    }
-  }
-
-  async searchMarketDefects(query = '', options = {}) {
-    await this.ensureLoggedIn();
-    try {
-      let searchUrl = `${this.baseUrl}/index.php?m=bugmarket&f=browse`;
-      const params = new URLSearchParams();
-      
-      if (query) params.append('param', query);
-      if (options.assignedTo) params.append('assignedTo', options.assignedTo);
-      if (options.status) params.append('browseType', options.status);
-      
-      if (params.toString()) {
-        searchUrl += '&' + params.toString();
-      }
-
-      const response = await this.client.get(searchUrl);
-      return this.parseBugList(response.data, options.limit || 20, '市场缺陷搜索');
-    } catch (error) {
-      return { success: false, error: error.message, bugs: [] };
-    }
-  }
 
   async getMyBugs(status = 'active', limit = 20) {
     await this.ensureLoggedIn();
@@ -600,90 +492,71 @@ export class RDMSMCPServer {
     }
   }
 
-  async getWorkDashboard() {
-    await this.ensureLoggedIn();
-    try {
-      const dashboardUrl = `${this.baseUrl}/index.php?m=my&f=index`;
-      const response = await this.client.get(dashboardUrl);
-      const $ = cheerio.load(response.data);
-      
-      const dashboard = {
-        pageTitle: $('title').text().trim(),
-        pageSize: response.data.length
-      };
-
-      // Extract dashboard statistics
-      $('.dashboard .panel, .block').each((i, panel) => {
-        const $panel = $(panel);
-        const title = $panel.find('.panel-heading, .block-title, h3, h4').text().trim();
-        const count = $panel.find('.count, .number, strong').text().trim();
-        
-        if (title.includes('BUG') || title.includes('bug')) {
-          dashboard.myBugs = count;
-        }
-        if (title.includes('缺陷')) {
-          dashboard.myDefects = count;
-        }
-      });
-
-      return {
-        success: true,
-        dashboard,
-        message: '工作面板信息获取成功'
-      };
-    } catch (error) {
-      return { success: false, error: error.message, dashboard: {} };
-    }
-  }
 
   parseBugList(html, limit = 20, type = 'BUG') {
     const $ = cheerio.load(html);
     const bugs = [];
     
-    const selectors = [
-      'table tbody tr',
-      '.table tbody tr',
-      '#bugList tbody tr',
-      '.bug-item',
-      'tr[data-id]'
-    ];
+    // 查找Bug链接
+    const bugLinks = $('a[href*="m=bug&f=view&id="]');
     
-    let bugRows = $();
-    for (const selector of selectors) {
-      bugRows = $(selector);
-      if (bugRows.length > 0) break;
-    }
-    
-    bugRows.each((index, element) => {
+    bugLinks.each((index, link) => {
       if (index >= limit) return false;
       
-      const $row = $(element);
-      const cells = $row.find('td');
+      const $link = $(link);
+      const href = $link.attr('href');
+      const title = $link.text().trim();
       
-      if (cells.length > 0) {
-        const bug = {
-          id: cells.eq(0).text().trim() || $row.attr('data-id') || '',
-          title: cells.eq(1).text().trim() || cells.eq(2).text().trim() || '',
-          status: cells.eq(3).text().trim() || cells.eq(4).text().trim() || '',
-          priority: cells.eq(4).text().trim() || cells.eq(5).text().trim() || '',
-          severity: cells.eq(2).text().trim() || cells.eq(3).text().trim() || '',
-          assignedTo: cells.eq(5).text().trim() || cells.eq(6).text().trim() || '',
-          reporter: cells.eq(6).text().trim() || cells.eq(7).text().trim() || '',
-          created: cells.eq(7).text().trim() || cells.eq(8).text().trim() || ''
-        };
-        
-        if (bug.id && bug.title) {
-          bugs.push(bug);
-        }
+      // 提取Bug ID
+      const match = href.match(/id=(\d+)/);
+      const bugId = match ? match[1] : '';
+      
+      // 只处理有效的Bug
+      if (bugId && parseInt(bugId) > 0 && title && title.length > 0) {
+        bugs.push({
+          id: bugId,
+          title: title,
+          status: '',
+          priority: '',
+          severity: '',
+          assignedTo: '',
+          reporter: '',
+          created: '',
+          url: href.startsWith('http') ? href : `${this.baseUrl}/${href.replace(/^\.\//, '')}`
+        });
       }
     });
     
+    // 如果找到Bug，返回结果
+    if (bugs.length > 0) {
+      return {
+        success: true,
+        total: bugs.length,
+        bugs: bugs,
+        type: type,
+        message: `找到 ${bugs.length} 个${type}`
+      };
+    }
+    
+    // 检查是否显示"暂时没有Bug"
+    const emptyTip = $('.table-empty-tip').text().trim();
+    if (emptyTip.includes('暂时没有Bug')) {
+      return {
+        success: true,
+        total: 0,
+        bugs: [],
+        type: type,
+        message: `暂无${type}`
+      };
+    }
+    
+    // 默认返回空结果
     return {
       success: true,
-      total: bugs.length,
-      bugs: bugs,
+      total: 0,
+      bugs: [],
       type: type,
-      message: bugs.length > 0 ? `找到 ${bugs.length} 个${type}` : `暂无${type}`
+      message: `暂无${type}`
     };
   }
 
