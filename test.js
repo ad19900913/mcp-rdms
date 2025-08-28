@@ -7,7 +7,7 @@ const TEST_CONFIG = {
   username: process.env.RDMS_USERNAME || 'jiangyuanchen',
   password: process.env.RDMS_PASSWORD || 'Rm123456',
   testBugId: process.env.TEST_BUG_ID || '141480',
-  testDefectId: process.env.TEST_DEFECT_ID || '11636',
+  testMarketBugId: process.env.TEST_MARKET_BUG_ID || '11636',
   testImageUrl: process.env.TEST_IMAGE_URL || 'https://rdms.streamax.com/index.php?m=file&f=read&t=png&fileID=411376'
 };
 
@@ -27,10 +27,10 @@ const AVAILABLE_TESTS = {
       bugId: TEST_CONFIG.testBugId
     }
   },
-  'rdms_get_market_defect': {
-    description: '测试获取市场缺陷详情',
+  'rdms_get_market_bug': {
+    description: '测试获取市场Bug详情',
     args: {
-      defectId: TEST_CONFIG.testDefectId
+      marketBugId: TEST_CONFIG.testMarketBugId
     }
   },
   'rdms_get_my_bugs': {
@@ -40,8 +40,8 @@ const AVAILABLE_TESTS = {
       limit: 5
     }
   },
-  'rdms_get_market_defects': {
-    description: '测试获取我的市场缺陷',
+  'rdms_get_my_market_bugs': {
+    description: '测试获取我的市场Bug',
     args: {
       limit: 5
     }
@@ -79,14 +79,14 @@ class RDMSTester {
         case 'rdms_get_bug':
           result = await this.server.getBug(args.bugId);
           break;
-        case 'rdms_get_market_defect':
-          result = await this.server.getMarketDefect(args.defectId);
+        case 'rdms_get_market_bug':
+          result = await this.server.getMarketBug(args.marketBugId);
           break;
         case 'rdms_get_my_bugs':
           result = await this.server.getMyBugs(args.status, args.limit);
           break;
-        case 'rdms_get_market_defects':
-          result = await this.server.getMarketDefects(args.limit);
+        case 'rdms_get_my_market_bugs':
+          result = await this.server.getMyMarketBugs(args.limit);
           break;
         case 'rdms_download_image':
           result = await this.server.downloadImage(args.imageUrl, args.filename, args.analyze);
@@ -204,7 +204,7 @@ ${Object.entries(AVAILABLE_TESTS).map(([name, config]) =>
   RDMS_USERNAME      - 用户名
   RDMS_PASSWORD      - 密码
   TEST_BUG_ID        - 测试用的Bug ID
-  TEST_DEFECT_ID     - 测试用的缺陷ID
+  TEST_MARKET_BUG_ID - 测试用的市场Bug ID
   TEST_IMAGE_URL     - 测试用的图片URL
 
 示例:

@@ -102,14 +102,14 @@ export class RDMSMCPServer {
           }
         },
         {
-          name: 'rdms_get_market_defect',
-          description: 'Get market defect details by ID with image extraction. Returns defect information including image URLs but NOT image content. If you need to analyze image content, use the rdms_download_image tool with the returned image URLs.',
+          name: 'rdms_get_market_bug',
+          description: 'Get market bug details by ID with image extraction. Returns market bug information including image URLs but NOT image content. If you need to analyze image content, use the rdms_download_image tool with the returned image URLs.',
           inputSchema: {
             type: 'object',
             properties: {
-              defectId: { type: 'string', description: 'Market defect ID' }
+              marketBugId: { type: 'string', description: 'Market bug ID' }
             },
-            required: ['defectId']
+            required: ['marketBugId']
           }
         },
         {
@@ -124,8 +124,8 @@ export class RDMSMCPServer {
           }
         },
         {
-          name: 'rdms_get_market_defects',
-          description: 'Get market defects assigned to current user',
+          name: 'rdms_get_my_market_bugs',
+          description: 'Get market bugs assigned to current user',
           inputSchema: {
             type: 'object',
             properties: {
@@ -158,12 +158,12 @@ export class RDMSMCPServer {
             return { content: [{ type: 'text', text: JSON.stringify(await this.login(args.baseUrl, args.username, args.password)) }] };
           case 'rdms_get_bug':
             return { content: [{ type: 'text', text: JSON.stringify(await this.getBug(args.bugId)) }] };
-          case 'rdms_get_market_defect':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.getMarketDefect(args.defectId)) }] };
+          case 'rdms_get_market_bug':
+            return { content: [{ type: 'text', text: JSON.stringify(await this.getMarketBug(args.marketBugId)) }] };
           case 'rdms_get_my_bugs':
             return { content: [{ type: 'text', text: JSON.stringify(await this.getMyBugs(args.status, args.limit)) }] };
-          case 'rdms_get_market_defects':
-            return { content: [{ type: 'text', text: JSON.stringify(await this.getMarketDefects(args.limit)) }] };
+          case 'rdms_get_my_market_bugs':
+            return { content: [{ type: 'text', text: JSON.stringify(await this.getMyMarketBugs(args.limit)) }] };
           case 'rdms_download_image':
             return await this.downloadImage(args.imageUrl, args.filename, args.analyze);
           default:
@@ -313,14 +313,14 @@ export class RDMSMCPServer {
     }
   }
 
-  async getMarketDefect(defectId) {
+  async getMarketBug(marketBugId) {
     await this.ensureLoggedIn();
     try {
-      const response = await this.client.get(`${this.baseUrl}/index.php?m=bugmarket&f=view&bugID=${defectId}`);
+      const response = await this.client.get(`${this.baseUrl}/index.php?m=bugmarket&f=view&bugID=${marketBugId}`);
       const $ = cheerio.load(response.data);
       
-      const defectInfo = {
-        id: defectId,
+      const marketBugInfo = {
+        id: marketBugId,
         title: $('.page-title').text().trim() || $('title').text().trim(),
         status: '', priority: '', severity: '', assignedTo: '', reporter: '',
         product: '', project: '', module: '', version: '', created: '', updated: '',
@@ -332,27 +332,27 @@ export class RDMSMCPServer {
         const src = $(img).attr('src');
         if (src && !src.includes('data:') && !src.includes('base64')) {
           const fullUrl = src.startsWith('http') ? src : `${this.baseUrl}${src}`;
-          defectInfo.images.push(fullUrl);
+          marketBugInfo.images.push(fullUrl);
         }
       });
 
-      // Extract defect fields (similar to bug extraction)
+      // Extract market bug fields
       $('.table-form tr, .detail tr').each((i, row) => {
         const $row = $(row);
         const label = $row.find('th, .label').text().trim();
         const value = $row.find('td:not(.label)').text().trim();
         
-        if (label.includes('状态') || label.includes('Status')) defectInfo.status = value;
-        if (label.includes('优先级') || label.includes('Priority')) defectInfo.priority = value;
-        if (label.includes('严重程度') || label.includes('Severity')) defectInfo.severity = value;
-        if (label.includes('指派给') || label.includes('AssignedTo')) defectInfo.assignedTo = value;
-        if (label.includes('由谁创建') || label.includes('Reporter')) defectInfo.reporter = value;
-        if (label.includes('所属产品') || label.includes('Product')) defectInfo.product = value;
-        if (label.includes('所属项目') || label.includes('Project')) defectInfo.project = value;
-        if (label.includes('所属模块') || label.includes('Module')) defectInfo.module = value;
+        if (label.includes('状态') || label.includes('Status')) marketBugInfo.status = value;
+        if (label.includes('优先级') || label.includes('Priority')) marketBugInfo.priority = value;
+        if (label.includes('严重程度') || label.includes('Severity')) marketBugInfo.severity = value;
+        if (label.includes('指派给') || label.includes('AssignedTo')) marketBugInfo.assignedTo = value;
+        if (label.includes('由谁创建') || label.includes('Reporter')) marketBugInfo.reporter = value;
+        if (label.includes('所属产品') || label.includes('Product')) marketBugInfo.product = value;
+        if (label.includes('所属项目') || label.includes('Project')) marketBugInfo.project = value;
+        if (label.includes('所属模块') || label.includes('Module')) marketBugInfo.module = value;
       });
 
-      return defectInfo;
+      return marketBugInfo;
     } catch (error) {
       return { error: error.message };
     }
@@ -481,12 +481,12 @@ export class RDMSMCPServer {
     }
   }
 
-  async getMarketDefects(limit = 20) {
+  async getMyMarketBugs(limit = 20) {
     await this.ensureLoggedIn();
     try {
-      const defectsUrl = `${this.baseUrl}/index.php?m=bugmarket&f=browse&productid=0&branch=0&browseType=assigntome`;
-      const response = await this.client.get(defectsUrl);
-      return this.parseBugList(response.data, limit, '市场缺陷');
+      const marketBugsUrl = `${this.baseUrl}/index.php?m=bugmarket&f=browse&productid=0&branch=0&browseType=assigntome`;
+      const response = await this.client.get(marketBugsUrl);
+      return this.parseBugList(response.data, limit, '市场Bug');
     } catch (error) {
       return { success: false, error: error.message, bugs: [] };
     }
