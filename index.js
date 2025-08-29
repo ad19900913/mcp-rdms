@@ -279,9 +279,18 @@ export class RDMSMCPServer {
         images: []
       };
 
-      // 提取标题
-      bugInfo.title = $('title').text().replace(/^BUG #\d+\s*/, '').replace(/\s*-.*$/, '').trim() || 
-                     $('.page-title, h1').text().trim();
+      // 提取标题 - 保留完整标题，只移除BUG编号和最后的系统名称
+      const fullTitle = $('title').text().trim();
+      if (fullTitle) {
+        // 移除开头的 "BUG #数字 " 和结尾的 " - 锐明RDMS"
+        bugInfo.title = fullTitle
+          .replace(/^BUG #\d+\s*/, '')
+          .replace(/\s*-\s*锐明RDMS\s*$/, '')
+          .replace(/\s*-\s*FT-V3\.X\s*-\s*锐明RDMS\s*$/, '')
+          .trim();
+      } else {
+        bugInfo.title = $('.page-title, h1').text().trim();
+      }
 
       // 提取图片
       $('img').each((i, img) => {
@@ -412,6 +421,32 @@ export class RDMSMCPServer {
         if (descArea) bugInfo.description = descArea;
       }
 
+      // 提取历史记录
+      bugInfo.history = [];
+      $('.histories-list li').each((i, historyItem) => {
+        const $item = $(historyItem);
+        const historyText = $item.clone().children().remove().end().text().trim();
+        const comment = $item.find('.comment-content').text().trim();
+        
+        if (historyText) {
+          // 解析历史记录文本，提取时间、操作人、操作内容
+          const historyMatch = historyText.match(/^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}),\s*由\s*(.+?)\s*(.+)$/);
+          
+          const historyRecord = {
+            rawText: historyText,
+            comment: comment || null
+          };
+          
+          if (historyMatch) {
+            historyRecord.time = historyMatch[1];
+            historyRecord.operator = historyMatch[2];
+            historyRecord.action = historyMatch[3];
+          }
+          
+          bugInfo.history.push(historyRecord);
+        }
+      });
+
       return bugInfo;
     } catch (error) {
       return { error: error.message };
@@ -426,7 +461,7 @@ export class RDMSMCPServer {
       
       const marketBugInfo = {
         id: marketBugId,
-        title: $('.page-title .text').text().trim() || $('.page-title').text().trim() || $('title').text().trim(),
+        title: '',
         status: '',
         priority: '',
         severity: '',
@@ -463,10 +498,22 @@ export class RDMSMCPServer {
         history: []
       };
 
-      // 提取基本标题信息
-      const titleElement = $('.page-title .text');
-      if (titleElement.length) {
-        marketBugInfo.title = titleElement.text().trim();
+      // 提取标题 - 优先从HTML title标签获取完整标题
+      const fullTitle = $('title').text().trim();
+      if (fullTitle) {
+        // 移除开头的 "BUG #数字 " 和结尾的 " - 锐明RDMS"
+        marketBugInfo.title = fullTitle
+          .replace(/^BUG #\d+\s*/, '')
+          .replace(/\s*-\s*锐明RDMS\s*$/, '')
+          .trim();
+      } else {
+        // 备选方案：从页面标题元素获取
+        const titleElement = $('.page-title .text');
+        if (titleElement.length) {
+          marketBugInfo.title = titleElement.text().trim();
+        } else {
+          marketBugInfo.title = $('.page-title').text().trim();
+        }
       }
 
       // 提取产品信息
@@ -571,10 +618,21 @@ export class RDMSMCPServer {
         const comment = $item.find('.comment-content').text().trim();
         
         if (historyText) {
-          marketBugInfo.history.push({
-            action: historyText,
+          // 解析历史记录文本，提取时间、操作人、操作内容
+          const historyMatch = historyText.match(/^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}),\s*由\s*(.+?)\s*(.+)$/);
+          
+          const historyRecord = {
+            rawText: historyText,
             comment: comment || null
-          });
+          };
+          
+          if (historyMatch) {
+            historyRecord.time = historyMatch[1];
+            historyRecord.operator = historyMatch[2];
+            historyRecord.action = historyMatch[3];
+          }
+          
+          marketBugInfo.history.push(historyRecord);
         }
       });
 
@@ -732,8 +790,8 @@ export class RDMSMCPServer {
     const $ = cheerio.load(html);
     const bugs = [];
     
-    // 查找Bug链接
-    const bugLinks = $('a[href*="m=bug&f=view&id="]');
+    // 查找Bug链接 - 修正选择器
+    const bugLinks = $('a[href*="m=bug&f=view&bugID="]');
     
     bugLinks.each((index, link) => {
       if (index >= limit) return false;
@@ -742,22 +800,33 @@ export class RDMSMCPServer {
       const href = $link.attr('href');
       const title = $link.text().trim();
       
-      // 提取Bug ID
-      const match = href.match(/id=(\d+)/);
+      // 提取Bug ID - 修正正则表达式
+      const match = href.match(/bugID=(\d+)/);
       const bugId = match ? match[1] : '';
+      
+      // 获取当前行的其他信息
+      const $row = $link.closest('tr');
+      const severity = $row.find('.label-severity-custom').text().trim() || 
+                      $row.find('[title*="严重程度"]').text().trim();
+      const priority = $row.find('.label-pri').text().trim();
+      const reporter = $row.find('td').eq(6).text().trim(); // 创建者列
+      const resolver = $row.find('td').eq(8).text().trim(); // 解决者列
+      const resolution = $row.find('td').eq(9).text().trim(); // 方案列
       
       // 只处理有效的Bug
       if (bugId && parseInt(bugId) > 0 && title && title.length > 0) {
         bugs.push({
           id: bugId,
           title: title,
-          status: '',
-          priority: '',
-          severity: '',
-          assignedTo: '',
-          reporter: '',
+          status: '', // 状态信息在这个页面中不直接显示
+          priority: priority,
+          severity: severity,
+          assignedTo: '', // 当前用户就是被指派人
+          reporter: reporter,
+          resolver: resolver,
+          resolution: resolution,
           created: '',
-          url: href.startsWith('http') ? href : `${this.baseUrl}/${href.replace(/^\.\//, '')}`
+          url: href.startsWith('http') ? href : `${this.baseUrl}${href.replace(/^\.\//, '')}`
         });
       }
     });

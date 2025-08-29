@@ -67,7 +67,7 @@ tar -tzf rdms-mcp-server-1.0.0.tgz
 ### 3. 发布到NPM
 ```bash
 # 发布
-npm publish
+npm publish --registry=https://registry.npmjs.org/
 
 # 如果是第一次发布公共包
 npm publish --access public
