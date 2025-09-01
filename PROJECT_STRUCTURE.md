@@ -1,26 +1,26 @@
 # RDMS MCP Server 项目结构
 
 ```
-rdms-mcp-server/
-├── .github/
-│   └── workflows/
-│       ├── publish.yml          # NPM自动发布工作流
-│       └── test.yml             # 自动测试工作流
+mcp-rdms/
 ├── docs/
 │   └── 需求背景.md              # 原始需求文档
+├── template/
+│   ├── BUG-138363.html          # BUG详情页面模板
+│   ├── BUG-LIST.html            # BUG列表页面模板
+│   ├── 市场缺陷-11636.html       # 市场缺陷详情模板
+│   └── 市场缺陷-LIST.html        # 市场缺陷列表模板
+├── node_modules/                # 依赖包目录
 ├── index.js                     # 主服务器文件
-├── test.js                      # 测试脚本
 ├── package.json                 # NPM包配置
 ├── package-lock.json            # 依赖锁定文件
 ├── README.md                    # 项目说明文档
+├── QUICK_START.md               # 快速开始指南
 ├── LICENSE                      # MIT许可证
 ├── CHANGELOG.md                 # 版本更新日志
 ├── CONTRIBUTING.md              # 贡献指南
 ├── PUBLISHING.md                # 发布指南
 ├── PROJECT_STRUCTURE.md         # 项目结构说明
-├── .gitignore                   # Git忽略文件
-├── cursor-mcp-config.json       # Cursor MCP配置示例
-└── cursor-settings-example.json # Cursor设置示例
+└── .gitignore                   # Git忽略文件
 ```
 
 ## 核心文件说明
@@ -32,26 +32,26 @@ rdms-mcp-server/
 - **认证管理** - Cookie会话管理
 - **错误处理** - 完整的错误处理机制
 
-### test.js
-- **统一测试框架** - 支持多种测试场景
-- **参数化测试** - 支持指定用户名、密码、测试类型
-- **实时输出** - 详细的测试结果展示
+### template/ 目录
+- **HTML模板文件** - 用于开发和测试的页面模板
+- **BUG相关模板** - BUG详情和列表页面结构
+- **市场缺陷模板** - 市场缺陷相关页面结构
 
 ### 配置文件
-- **package.json** - 完整的NPM包信息
-- **cursor-mcp-config.json** - Cursor集成配置
+- **package.json** - 完整的NPM包信息，版本1.0.4
 - **环境变量支持** - RDMS_BASE_URL, RDMS_USERNAME, RDMS_PASSWORD
 
 ### 文档文件
 - **README.md** - 完整的使用说明和功能介绍
+- **QUICK_START.md** - 快速开始指南
 - **CHANGELOG.md** - 版本历史和更新记录
 - **CONTRIBUTING.md** - 开发者贡献指南
 - **PUBLISHING.md** - 发布到各平台的详细步骤
 
-### 自动化
-- **GitHub Actions** - 自动测试和发布流程
-- **多Node.js版本测试** - 确保兼容性
-- **自动NPM发布** - Release时自动发布
+### 开发和测试
+- **NPM脚本** - start, dev, test, test:publish 等命令
+- **模板文件** - 用于开发调试的HTML模板
+- **依赖管理** - 使用 package-lock.json 锁定版本
 
 ## 主要功能模块
 
